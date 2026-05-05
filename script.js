@@ -260,6 +260,7 @@ const elements = {
 };
 
 const state = loadState();
+let pendingSavePayload = null;
 
 init();
 
@@ -467,17 +468,23 @@ async function handleSaveManualAssignment(event) {
     return;
   }
 
-  if (existingEntry && areSectionsEqual(existingEntry.sections, normalizedSections)) {
+  if (existingEntry && areAssignmentPayloadEqual(existingEntry, normalizedSections, meta)) {
     showNotice(`Ya se han guardado datos de ${formatDate(date)}. Chequear en el historial.`, "error");
     return;
   }
 
+  showSaveConfirmation({ date, sections: normalizedSections, meta, existingEntry });
+}
+
+async function saveConfirmedManualAssignment(payload) {
+  const { date, sections, meta, existingEntry } = payload;
   elements.saveAssignmentButton.disabled = true;
 
   try {
-    const result = upsertAssignment(date, normalizedSections, meta);
+    const result = upsertAssignment(date, sections, meta);
     saveState();
     const databaseResult = await persistFullHistoryInDatabase(result.entry);
+    closeSaveConfirmation();
     render();
     const firestoreFailed = databaseResult?.firestore === false;
     const message = firestoreFailed
@@ -488,9 +495,80 @@ async function handleSaveManualAssignment(event) {
     showNotice(message, firestoreFailed ? "error" : "success");
   } catch (error) {
     console.warn("No se pudo guardar el historial completo.", error);
+    closeSaveConfirmation();
     showNotice("No se pudo guardar el historial completo. Intentalo nuevamente.", "error");
     render();
   }
+}
+
+function showSaveConfirmation(payload) {
+  pendingSavePayload = payload;
+  const modal = getSaveConfirmationModal();
+  const description = modal.querySelector("[data-save-confirm-description]");
+  const acceptButton = modal.querySelector("[data-save-confirm-accept]");
+
+  description.textContent = payload.existingEntry
+    ? `Vas a actualizar la asignacion guardada de ${formatDate(payload.date)}. Solo se guardara si aceptas.`
+    : `Vas a guardar la asignacion de ${formatDate(payload.date)} en el historial y Firestore. Solo se guardara si aceptas.`;
+
+  acceptButton.disabled = false;
+  modal.hidden = false;
+  document.body.classList.add("has-save-confirm-modal");
+  acceptButton.focus();
+}
+
+function closeSaveConfirmation() {
+  const modal = document.querySelector("#saveConfirmModal");
+  if (!modal) return;
+
+  modal.hidden = true;
+  document.body.classList.remove("has-save-confirm-modal");
+  pendingSavePayload = null;
+}
+
+function getSaveConfirmationModal() {
+  let modal = document.querySelector("#saveConfirmModal");
+  if (modal) return modal;
+
+  modal = document.createElement("div");
+  modal.id = "saveConfirmModal";
+  modal.className = "save-confirm-modal";
+  modal.hidden = true;
+  modal.setAttribute("role", "dialog");
+  modal.setAttribute("aria-modal", "true");
+  modal.setAttribute("aria-labelledby", "saveConfirmTitle");
+
+  modal.innerHTML = `
+    <article class="save-confirm-card">
+      <button class="save-confirm-close" type="button" data-save-confirm-close aria-label="Cerrar confirmacion">&times;</button>
+      <p class="section-kicker">Confirmacion</p>
+      <h2 id="saveConfirmTitle">Guardar cambios</h2>
+      <p data-save-confirm-description></p>
+      <div class="save-confirm-actions">
+        <button class="secondary-button" type="button" data-save-confirm-accept>Aceptar</button>
+        <button class="ghost-button" type="button" data-save-confirm-close>Seguir haciendo cambios</button>
+      </div>
+    </article>
+  `;
+
+  modal.addEventListener("click", (event) => {
+    if (event.target === modal || event.target.closest("[data-save-confirm-close]")) {
+      closeSaveConfirmation();
+    }
+  });
+
+  modal.querySelector("[data-save-confirm-accept]").addEventListener("click", async (event) => {
+    if (!pendingSavePayload) return;
+    event.currentTarget.disabled = true;
+    await saveConfirmedManualAssignment(pendingSavePayload);
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !modal.hidden) closeSaveConfirmation();
+  });
+
+  document.body.appendChild(modal);
+  return modal;
 }
 
 function handleManualAssignmentChange(event) {
@@ -2809,6 +2887,13 @@ function getUniqueHistoryByDate(history) {
 
 function areSectionsEqual(firstSections, secondSections) {
   return JSON.stringify(normalizeSections(firstSections)) === JSON.stringify(normalizeSections(secondSections));
+}
+
+function areAssignmentPayloadEqual(entry, sections, meta) {
+  return (
+    areSectionsEqual(entry.sections, sections) &&
+    JSON.stringify(normalizeAssignmentMeta(entry.meta)) === JSON.stringify(normalizeAssignmentMeta(meta))
+  );
 }
 
 function countUniqueEntryPeople(entry) {

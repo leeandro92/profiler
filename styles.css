@@ -1112,6 +1112,78 @@ select:focus {
   background: linear-gradient(135deg, rgba(225, 38, 47, 0.08), #ffffff);
 }
 
+.save-confirm-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: grid;
+  place-items: center;
+  padding: 22px;
+  background: rgba(15, 23, 42, 0.56);
+  backdrop-filter: blur(8px);
+}
+
+.save-confirm-modal[hidden] {
+  display: none !important;
+}
+
+.save-confirm-card {
+  position: relative;
+  width: min(460px, 100%);
+  padding: clamp(24px, 5vw, 34px);
+  border: 1px solid rgba(225, 38, 47, 0.22);
+  border-radius: 26px;
+  background: linear-gradient(145deg, #ffffff, #fff7f7);
+  box-shadow: 0 30px 70px rgba(15, 23, 42, 0.28);
+  animation: verificationCardIn 0.24s ease both;
+}
+
+.save-confirm-card h2 {
+  margin: 6px 0 10px;
+  color: var(--ink);
+  font-size: clamp(1.45rem, 4vw, 2rem);
+}
+
+.save-confirm-card p:not(.section-kicker) {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.save-confirm-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--ink);
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.save-confirm-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.has-save-confirm-modal {
+  overflow: hidden;
+}
+
+@media (max-width: 560px) {
+  .save-confirm-actions {
+    grid-template-columns: 1fr;
+  }
+}
+
 .assignment-actions {
   display: flex;
   justify-content: flex-end;
