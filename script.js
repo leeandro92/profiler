@@ -2074,12 +2074,7 @@ function createSlotSelect(section, role, index, selectedId, requirement = {}) {
   select.appendChild(emptyOption);
 
   const roleKey = getRoleKey(section.id, role.id);
-  const peopleOptions = getPeopleForSelect(
-    state.currentAssignment.date,
-    roleKey,
-    requirement.gender,
-    requirement.requiredRoleKey,
-  );
+  const peopleOptions = getPeopleForManualSelect(state.currentAssignment.date);
   peopleOptions.forEach((person) => {
     const option = document.createElement("option");
     option.value = person.id;
@@ -2097,6 +2092,12 @@ function createSlotSelect(section, role, index, selectedId, requirement = {}) {
   select.value = selectedId;
   row.appendChild(select);
   return row;
+}
+
+function getPeopleForManualSelect(date) {
+  return getActivePeople(date)
+    .slice()
+    .sort((a, b) => a.name.localeCompare(b.name, "es"));
 }
 
 function fillSelect(select, people, placeholder) {
