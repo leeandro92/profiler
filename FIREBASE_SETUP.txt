@@ -1,0 +1,33 @@
+CONFIGURACION RAPIDA DE FIREBASE / FIRESTORE
+
+1. Entrar a Firebase Console:
+   https://console.firebase.google.com/
+
+2. Crear o abrir un proyecto.
+
+3. Crear una app Web dentro del proyecto.
+
+4. Copiar el objeto firebaseConfig que entrega Firebase.
+
+5. Abrir firebase-config.js y reemplazar los valores PEGAR_... por los datos reales.
+
+6. Cambiar:
+   enabled: false
+
+   por:
+   enabled: true
+
+7. Crear una base Cloud Firestore en Firebase.
+
+8. En Firestore > Reglas, pegar el contenido de firestore.rules y publicar.
+
+IMPORTANTE:
+Las reglas incluidas permiten leer y escribir sin login para que la app funcione facil.
+Si la pagina va a quedar publica, conviene agregar autenticacion para proteger el historial.
+
+COLECCION USADA:
+profilers_history
+
+QUE SE GUARDA:
+Cada fecha del historial se guarda como un documento separado en Firestore.
+La app mantiene tambien una copia local para poder seguir funcionando si no hay internet.

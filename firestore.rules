@@ -1,0 +1,20 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /profilers_history/{entryId} {
+      allow read, write: if true;
+    }
+
+    match /profilers_vacations/{entryId} {
+      allow read, write: if true;
+    }
+
+    match /profilers_auth_users/{userId} {
+      allow create: if request.auth != null && request.auth.uid == userId;
+      allow list: if true;
+      allow read, update: if request.auth != null && request.auth.uid == userId;
+      allow delete: if false;
+    }
+  }
+}

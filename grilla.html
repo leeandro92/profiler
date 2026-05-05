@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Grilla anual - Profilers</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800;900&family=Manrope:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="grilla-auth-locked">
+    <main id="top" class="app-shell grilla-page" data-grilla-shell hidden>
+      <header class="site-header">
+        <a class="brand" href="index.html" aria-label="Inicio">
+          <span class="brand-mark">
+            <img src="profiler-logo.jpg" alt="Profilers" />
+          </span>
+          <span>
+            <strong>Profilers</strong>
+            <small>Grilla anual</small>
+          </span>
+        </a>
+
+        <nav class="app-nav" aria-label="Navegacion principal">
+          <a class="nav-link" href="login.html" data-owner-link hidden>Puestos</a>
+          <a class="nav-link" href="historial.html" data-owner-link hidden>Historial</a>
+          <a class="nav-link" href="vacaciones.html" data-vacations-link hidden>Vacaciones</a>
+          <a class="nav-link is-active" href="grilla.html" data-grilla-link hidden>Calendario</a>
+          <a class="nav-link" href="administrador.html" data-admin-link hidden>Vacaciones</a>
+          <button class="nav-link auth-logout-button" type="button" data-auth-logout hidden>Cerrar sesion</button>
+        </nav>
+      </header>
+
+      <section class="hero-panel grilla-hero">
+        <div class="hero-copy-block">
+          <p class="eyebrow">Vista anual</p>
+          <h1>Calendario anual</h1>
+          <p class="hero-copy">
+            Consulta una matriz anual por mes y dia, preparada para completar nombres desde una base de datos.
+          </p>
+        </div>
+      </section>
+
+      <section class="panel grilla-panel" aria-labelledby="grillaTitle">
+        <div class="panel-header grilla-header">
+          <div>
+            <p class="section-kicker">Calendario anual</p>
+            <h2 id="grillaTitle">Meses y dias</h2>
+          </div>
+
+          <div class="grilla-actions">
+            <label class="grilla-year-control">
+              Año
+              <input id="grillaYear" type="number" min="1900" max="2100" step="1" />
+            </label>
+            <button id="loadGrillaData" class="primary-button grilla-load-button" type="button">
+              Actualizar datos
+            </button>
+            <button id="downloadGrillaImage" class="secondary-button grilla-download-button" type="button">
+              Descargar imagen
+            </button>
+          </div>
+        </div>
+
+        <p id="grillaStatus" class="grilla-status" role="status">
+          La grilla esta lista para traer datos desde la base.
+        </p>
+
+        <div class="grilla-scroll" aria-live="polite">
+          <table class="grilla-table" id="grillaTable">
+            <caption>
+              Grilla anual preparada para cargar nombres por fecha.
+            </caption>
+          </table>
+        </div>
+      </section>
+
+      <footer class="app-footer">
+        <div class="footer-brand">
+          <strong>Profilers</strong>
+          <span>Organizador operativo diario</span>
+          <small>© 2026 Nieto Leandro</small>
+        </div>
+
+        <nav class="footer-group" aria-label="Links rapidos">
+          <strong>Links rapidos</strong>
+          <a href="login.html" data-owner-link hidden>Puestos</a>
+          <a href="historial.html" data-owner-link hidden>Historial</a>
+          <a href="vacaciones.html" data-vacations-link hidden>Vacaciones</a>
+          <a href="grilla.html" data-grilla-link hidden>Calendario</a>
+          <a href="administrador.html" data-admin-link hidden>Vacaciones</a>
+          <a href="#contacto">Contacto</a>
+          <a href="#sobre-nosotros">Sobre nosotros</a>
+          <a href="#faq">FAQ</a>
+        </nav>
+
+        <nav class="footer-group" aria-label="Legal">
+          <strong>Legal</strong>
+          <a href="#privacidad">Politica de privacidad</a>
+          <a href="#terminos">Terminos</a>
+        </nav>
+
+        <nav class="footer-social" aria-label="Redes sociales">
+          <strong>Seguinos</strong>
+          <a class="instagram-link" href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="3" y="3" width="18" height="18" rx="5"></rect>
+              <circle cx="12" cy="12" r="4"></circle>
+              <circle cx="17.5" cy="6.5" r="1.2"></circle>
+            </svg>
+            <span>Instagram</span>
+          </a>
+          <a class="social-link facebook-link" href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M15.2 8.2h-2c-.5 0-.8.3-.8.9v1.5h2.7l-.4 2.8h-2.3V21H9.5v-7.6H7.2v-2.8h2.3V8.8c0-2.4 1.5-3.8 3.7-3.8 1.1 0 2 .1 2 .1v3.1Z"></path>
+            </svg>
+            <span>Facebook</span>
+          </a>
+          <a class="social-link linkedin-link" href="https://www.linkedin.com/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M6.8 10.2H4V20h2.8v-9.8Z"></path>
+              <path d="M5.4 8.8a1.7 1.7 0 1 0 0-3.4 1.7 1.7 0 0 0 0 3.4Z"></path>
+              <path d="M10 10.2h2.7v1.3c.4-.7 1.3-1.5 2.8-1.5 3 0 3.5 2 3.5 4.5V20h-2.8v-4.9c0-1.2 0-2.7-1.6-2.7s-1.9 1.3-1.9 2.6v5H10v-9.8Z"></path>
+            </svg>
+            <span>LinkedIn</span>
+          </a>
+          <a class="social-link tiktok-link" href="https://www.tiktok.com/" target="_blank" rel="noopener noreferrer" aria-label="TikTok">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M14.2 4c.4 2.7 1.9 4.3 4.4 4.5v3c-1.5.1-2.8-.4-4.3-1.2v5.6c0 2.8-2 4.9-4.8 4.9-2.7 0-4.7-1.9-4.7-4.5 0-3 2.8-5.1 5.8-4.4v3.1c-1.4-.4-2.7.2-2.7 1.4 0 .9.7 1.5 1.6 1.5 1.1 0 1.8-.7 1.8-2.1V4h2.9Z"></path>
+            </svg>
+            <span>TikTok</span>
+          </a>
+        </nav>
+
+        <a class="footer-button" href="#top">Volver arriba</a>
+      </footer>
+    </main>
+
+    <script src="firebase-config.js"></script>
+    <script src="db.js"></script>
+    <script src="auth-nav.js?v=20260505-6"></script>
+    <script src="grilla-auth.js"></script>
+    <script src="grilla.js"></script>
+  </body>
+</html>

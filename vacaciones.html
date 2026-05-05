@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calendario de Vacaciones</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800;900&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="vacaciones.css">
+</head>
+<body class="vacations-auth-locked">
+  <div id="top" class="app-shell" data-vacations-shell hidden>
+    <header class="site-header">
+      <a class="brand" href="index.html" aria-label="Inicio">
+        <span class="brand-mark">
+          <img src="profiler-logo.jpg" alt="Profilers">
+        </span>
+        <span>
+          <strong>Profilers</strong>
+          <small>Vacaciones operativas</small>
+        </span>
+      </a>
+
+      <nav class="app-nav" aria-label="Navegacion principal">
+        <a class="nav-link" href="login.html" data-owner-link hidden>Puestos</a>
+        <a class="nav-link" href="historial.html" data-owner-link hidden>Historial</a>
+        <a class="nav-link is-active" href="vacaciones.html" data-vacations-link hidden>Vacaciones</a>
+        <a class="nav-link" href="grilla.html" data-grilla-link hidden>Calendario</a>
+        <a class="nav-link" href="administrador.html" data-admin-link hidden>Vacaciones</a>
+        <button id="vacationLogoutButton" class="nav-link logout-nav-button is-hidden" type="button" data-auth-logout hidden>Cerrar sesion</button>
+      </nav>
+    </header>
+
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Gestion interna</p>
+        <h1>Vacaciones Profilers</h1>
+      </div>
+      <div class="today-chip" id="todayChip"></div>
+    </header>
+
+    <main class="workspace">
+      <section class="calendar-section" aria-label="Calendario mensual">
+        <div class="calendar-toolbar">
+          <button class="icon-button" id="prevMonth" type="button" aria-label="Mes anterior" title="Mes anterior">
+            <span aria-hidden="true">←</span>
+          </button>
+
+          <div class="month-controls">
+            <select id="monthSelect" aria-label="Seleccionar mes"></select>
+            <input id="yearInput" type="number" min="1900" max="2100" aria-label="Seleccionar año">
+          </div>
+
+          <button class="icon-button" id="nextMonth" type="button" aria-label="Mes siguiente" title="Mes siguiente">
+            <span aria-hidden="true">→</span>
+          </button>
+        </div>
+
+        <div class="weekday-row" aria-hidden="true">
+          <span>Lun</span>
+          <span>Mar</span>
+          <span>Mie</span>
+          <span>Jue</span>
+          <span>Vie</span>
+          <span>Sab</span>
+          <span>Dom</span>
+        </div>
+
+        <div class="calendar-grid" id="calendarGrid" aria-live="polite"></div>
+
+        <section class="summary-section" aria-label="Resumen de vacaciones agendadas">
+          <div class="summary-heading">
+            <div>
+              <p class="eyebrow">Resumen</p>
+              <h2>Vacaciones agendadas</h2>
+            </div>
+            <span id="summaryCount" class="summary-count">0 cargas</span>
+          </div>
+          <div class="summary-list" id="summaryList"></div>
+        </section>
+      </section>
+
+      <aside class="side-panel" aria-label="Panel de gestion de vacaciones">
+        <section class="panel-block">
+          <div class="section-heading">
+            <p class="eyebrow">Asignacion</p>
+            <h2>Agendar vacaciones</h2>
+          </div>
+
+          <form id="vacationForm" class="form-grid">
+            <label>
+              Profiler
+              <select id="personSelect" required>
+                <option value="">Seleccionar profiler</option>
+              </select>
+            </label>
+
+            <div class="date-fields">
+              <label>
+                Desde
+                <input id="startDate" type="date" required>
+              </label>
+              <label>
+                Hasta
+                <input id="endDate" type="date" required>
+              </label>
+            </div>
+
+            <div class="button-row">
+              <button class="primary-button" type="submit">Agendar</button>
+            </div>
+          </form>
+
+          <p class="status-message" id="statusMessage" role="status"></p>
+        </section>
+
+        <section class="panel-block vacation-search-panel">
+          <div class="section-heading compact-heading">
+            <p class="eyebrow">Base de datos</p>
+            <h2>Buscar vacaciones</h2>
+          </div>
+
+          <form id="vacationSearchForm" class="vacation-search-form">
+            <label>
+              Nombre y apellido
+              <input id="vacationSearchInput" type="search" placeholder="" autocomplete="off">
+            </label>
+            <button class="primary-button" type="submit">Buscar agenda</button>
+          </form>
+
+          <div id="vacationSearchResults" class="vacation-search-results">
+            <div class="summary-empty">Busca un profiler para ver sus comprobantes guardados.</div>
+          </div>
+        </section>
+
+        <section class="panel-block profilers-panel">
+          <div class="section-heading compact-heading">
+            <h2 class="profilers-title">Profilers</h2>
+          </div>
+          <div class="legend-list" id="legendList"></div>
+        </section>
+      </aside>
+    </main>
+
+    <footer class="app-footer">
+      <div class="footer-brand">
+        <strong>Profilers</strong>
+        
+        <p>© 2026 Nieto Leandro</p>
+      </div>
+      <nav class="footer-group" aria-label="Links rapidos">
+        
+        <a href="login.html" data-owner-link hidden>Puestos</a>
+        <a href="historial.html" data-owner-link hidden>Historial</a>
+        <a href="vacaciones.html" data-vacations-link hidden>Vacaciones</a>
+        <a href="grilla.html" data-grilla-link hidden>Calendario</a>
+        <a href="administrador.html" data-admin-link hidden>Vacaciones</a>
+        <a href="#">Contacto</a>
+        <a href="#">Sobre nosotros</a>
+        <a href="#">FAQ</a>
+      </nav>
+
+      <nav class="footer-group" aria-label="Legal">
+        
+        <a href="#">Politica de privacidad</a>
+        <a href="#">Terminos</a>
+      </nav>
+
+      <nav class="footer-social" aria-label="Redes sociales">
+        <strong>Seguinos</strong>
+        <a class="instagram-link" href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="3" y="3" width="18" height="18" rx="5"></rect>
+            <circle cx="12" cy="12" r="4"></circle>
+            <circle cx="17.5" cy="6.5" r="1.2"></circle>
+          </svg>
+          <span>Instagram</span>
+        </a>
+        <a class="social-link facebook-link" href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M15.2 8.2h-2c-.5 0-.8.3-.8.9v1.5h2.7l-.4 2.8h-2.3V21H9.5v-7.6H7.2v-2.8h2.3V8.8c0-2.4 1.5-3.8 3.7-3.8 1.1 0 2 .1 2 .1v3.1Z"></path>
+          </svg>
+          <span>Facebook</span>
+        </a>
+        <a class="social-link linkedin-link" href="https://www.linkedin.com/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M6.8 10.2H4V20h2.8v-9.8Z"></path>
+            <path d="M5.4 8.8a1.7 1.7 0 1 0 0-3.4 1.7 1.7 0 0 0 0 3.4Z"></path>
+            <path d="M10 10.2h2.7v1.3c.4-.7 1.3-1.5 2.8-1.5 3 0 3.5 2 3.5 4.5V20h-2.8v-4.9c0-1.2 0-2.7-1.6-2.7s-1.9 1.3-1.9 2.6v5H10v-9.8Z"></path>
+          </svg>
+          <span>LinkedIn</span>
+        </a>
+        <a class="social-link tiktok-link" href="https://www.tiktok.com/" target="_blank" rel="noopener noreferrer" aria-label="TikTok">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M14.2 4c.4 2.7 1.9 4.3 4.4 4.5v3c-1.5.1-2.8-.4-4.3-1.2v5.6c0 2.8-2 4.9-4.8 4.9-2.7 0-4.7-1.9-4.7-4.5 0-3 2.8-5.1 5.8-4.4v3.1c-1.4-.4-2.7.2-2.7 1.4 0 .9.7 1.5 1.6 1.5 1.1 0 1.8-.7 1.8-2.1V4h2.9Z"></path>
+          </svg>
+          <span>TikTok</span>
+        </a>
+      </nav>
+
+      <a class="footer-button" href="#top">Volver arriba</a>
+    </footer>
+  </div>
+
+  <script src="firebase-config.js"></script>
+  <script src="db.js"></script>
+  <script src="auth-nav.js?v=20260505-6"></script>
+  <script src="vacaciones-auth.js?v=20260505"></script>
+  <script src="vacaciones.js"></script>
+</body>
+</html>

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Administrador - Calendario</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800;900&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="administrador.css">
+</head>
+<body class="admin-auth-locked">
+  <div id="top" class="app-shell admin-readonly-shell" data-admin-shell hidden>
+    <header class="site-header" data-admin-nav hidden>
+      <a class="brand" href="index.html" aria-label="Inicio">
+        <span class="brand-mark">
+          <img src="profiler-logo.jpg" alt="Profilers">
+        </span>
+        <span>
+          <strong>Profilers</strong>
+          <small>Vista protegida</small>
+        </span>
+      </a>
+
+      <nav class="app-nav" aria-label="Navegacion principal">
+        <a class="nav-link" href="login.html" data-owner-link hidden>Puestos</a>
+        <a class="nav-link" href="historial.html" data-owner-link hidden>Historial</a>
+        <a class="nav-link" href="vacaciones.html" data-vacations-link hidden>Vacaciones</a>
+        <a class="nav-link" href="grilla.html" data-grilla-link hidden>Calendario</a>
+        <a class="nav-link is-active" href="administrador.html" data-admin-link hidden>Vacaciones</a>
+        <button id="vacationLogoutButton" class="nav-link logout-nav-button is-hidden" type="button" data-auth-logout hidden>Cerrar sesion</button>
+      </nav>
+    </header>
+
+    <header class="topbar admin-readonly-topbar">
+      <div>
+        <p class="eyebrow">Solo lectura</p>
+        <h1>Calendario de vacaciones</h1>
+      </div>
+      <div class="today-chip" id="todayChip"></div>
+    </header>
+
+    <main class="admin-readonly-main">
+      <section class="calendar-section admin-calendar-section" aria-label="Calendario mensual">
+        <div class="calendar-toolbar">
+          <button class="icon-button" id="prevMonth" type="button" aria-label="Mes anterior" title="Mes anterior">
+            <span aria-hidden="true">←</span>
+          </button>
+
+          <div class="month-controls">
+            <select id="monthSelect" aria-label="Seleccionar mes"></select>
+            <input id="yearInput" type="number" min="1900" max="2100" aria-label="Seleccionar año">
+          </div>
+
+          <button class="icon-button" id="nextMonth" type="button" aria-label="Mes siguiente" title="Mes siguiente">
+            <span aria-hidden="true">→</span>
+          </button>
+        </div>
+
+        <p id="adminCalendarStatus" class="status-message admin-readonly-status" role="status">
+          Cargando vacaciones desde la base de datos...
+        </p>
+
+        <div class="weekday-row" aria-hidden="true">
+          <span>Lun</span>
+          <span>Mar</span>
+          <span>Mie</span>
+          <span>Jue</span>
+          <span>Vie</span>
+          <span>Sab</span>
+          <span>Dom</span>
+        </div>
+
+        <div class="calendar-grid" id="calendarGrid" aria-live="polite"></div>
+      </section>
+
+      <section class="calendar-section admin-search-section" aria-label="Buscar vacaciones por nombre">
+        <div class="section-heading compact-heading">
+          <p class="eyebrow">Consulta</p>
+          <h2>Buscar mis vacaciones</h2>
+        </div>
+
+        <form id="adminVacationSearchForm" class="vacation-search-form admin-search-form">
+          <label>
+            Nombre y apellido
+            <input id="adminVacationSearchInput" type="search" placeholder="" autocomplete="off" required>
+          </label>
+          <button class="primary-button" type="submit">Buscar</button>
+        </form>
+
+        <div id="adminVacationSearchResults" class="vacation-search-results admin-search-results">
+          <div class="summary-empty">Ingresa tu nombre para ver tus comprobantes guardados.</div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="app-footer">
+      <div class="footer-brand">
+        <strong>Profilers</strong>
+        <p>© 2026 Nieto Leandro</p>
+      </div>
+      <nav class="footer-group" aria-label="Links rapidos">
+        <strong>Links rapidos</strong>
+        <a href="login.html" data-owner-link hidden>Puestos</a>
+        <a href="historial.html" data-owner-link hidden>Historial</a>
+        <a href="vacaciones.html" data-vacations-link hidden>Vacaciones</a>
+        <a href="grilla.html" data-grilla-link hidden>Calendario</a>
+        <a href="administrador.html" data-admin-link hidden>Vacaciones</a>
+      </nav>
+
+      <nav class="footer-group" aria-label="Legal">
+        <strong>Legal</strong>
+        <a href="#">Política de privacidad</a>
+        <a href="#">Términos</a>
+      </nav>
+
+      <a class="footer-button" href="#top">Volver arriba</a>
+    </footer>
+  </div>
+
+  <script src="firebase-config.js"></script>
+  <script src="db.js"></script>
+  <script src="auth-nav.js?v=20260505-6"></script>
+  <script src="administrador-auth.js?v=20260501"></script>
+  <script src="administrador.js"></script>
+</body>
+</html>
