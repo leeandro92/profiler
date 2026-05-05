@@ -281,7 +281,7 @@ function buildCanvasRows(history, contentWidth) {
           const names = (entry.sections?.[sourceSection.id]?.[role.id] || []).map((personId) =>
             getPersonName(personId, entry),
           );
-          return { role: role.label, names: names.length ? names : ["-"] };
+          return { role: role.label, names: getHistoryRoleNames(entry, sourceSection, role, names) };
         });
         entryRows.push({ id: displaySection.id, title: displaySection.label, roleRows });
       });
@@ -528,9 +528,10 @@ function createHistoryRole(entry, section, role) {
   const names = (entry.sections?.[section.id]?.[role.id] || []).map((personId) =>
     getPersonName(personId, entry),
   );
+  const displayNames = getHistoryRoleNames(entry, section, role, names);
 
-  if (names.length) {
-    names.forEach((name, index) => {
+  if (displayNames.length) {
+    displayNames.forEach((name, index) => {
       if (index > 0) namesBox.appendChild(document.createElement("br"));
       namesBox.appendChild(document.createTextNode(name));
     });
@@ -540,6 +541,16 @@ function createHistoryRole(entry, section, role) {
 
   roleBox.append(roleName, namesBox);
   return roleBox;
+}
+
+function getHistoryRoleNames(entry, section, role, names) {
+  const displayNames = names.length ? [...names] : ["-"];
+
+  if (section.id === "principales" && role.id === "cierre_lobby" && entry.meta?.lobbyCloseTime) {
+    displayNames.push(`Horario: ${entry.meta.lobbyCloseTime}`);
+  }
+
+  return displayNames;
 }
 
 function getSection(sectionId) {

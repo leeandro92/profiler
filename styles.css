@@ -1085,6 +1085,18 @@ select:focus {
   margin: 0;
 }
 
+.role-time-field {
+  gap: 6px;
+  padding-top: 4px;
+}
+
+.role-time-field span {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
 .assignment-actions {
   display: flex;
   justify-content: flex-end;

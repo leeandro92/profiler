@@ -1,6 +1,9 @@
 const STORAGE_KEY = "rotador-puestos-v1";
-const SCHEMA_VERSION = 8;
+const SCHEMA_VERSION = 9;
 const ROTATION_START_DATE = "2026-04-27";
+const ASSIGNMENT_META_DEFAULTS = {
+  lobbyCloseTime: "",
+};
 
 const GENDERS = {
   mujer: "Mujer",
@@ -346,6 +349,7 @@ function migrateHistoryEntry(entry, guardId) {
     guardId: entry.guardId || guardId,
     sections: normalizeSections(sections),
     personSnapshot: entry.personSnapshot || entry.personNames || {},
+    meta: normalizeAssignmentMeta(entry.meta),
     createdAt: entry.createdAt || new Date().toISOString(),
     updatedAt: entry.updatedAt || new Date().toISOString(),
   };
@@ -361,6 +365,7 @@ function migrateCurrentAssignment(assignment) {
       },
     ),
     personSnapshot: assignment.personSnapshot || assignment.personNames || {},
+    meta: normalizeAssignmentMeta(assignment.meta),
   };
 }
 
@@ -372,6 +377,13 @@ function normalizeSections(sections) {
     });
     return result;
   }, {});
+}
+
+function normalizeAssignmentMeta(meta) {
+  return {
+    ...ASSIGNMENT_META_DEFAULTS,
+    ...(meta && typeof meta === "object" ? meta : {}),
+  };
 }
 
 function saveState() {
@@ -429,6 +441,7 @@ async function handleSaveManualAssignment(event) {
 
   const date = state.currentAssignment.date;
   const sections = collectAssignmentFromForm();
+  const meta = collectAssignmentMetaFromForm();
   const normalizedSections = normalizeSections(sections);
   const existingEntry = getHistoryEntryByDate(date);
   const validation = validateManualAssignment(sections, date);
@@ -446,7 +459,7 @@ async function handleSaveManualAssignment(event) {
   elements.saveAssignmentButton.disabled = true;
 
   try {
-    const result = upsertAssignment(date, normalizedSections);
+    const result = upsertAssignment(date, normalizedSections, meta);
     saveState();
     const databaseResult = await persistFullHistoryInDatabase(result.entry);
     render();
@@ -465,14 +478,22 @@ async function handleSaveManualAssignment(event) {
 }
 
 function handleManualAssignmentChange(event) {
-  if (!event.target.matches("select[data-section-id]") || !state.currentAssignment) return;
+  if (!event.target.matches("select[data-section-id], input[data-assignment-meta]") || !state.currentAssignment) return;
 
   const date = state.currentAssignment.date;
   const sections = collectAssignmentFromForm();
+  const meta = collectAssignmentMetaFromForm();
+
+  if (event.target.matches("input[data-assignment-meta]")) {
+    setCurrentAssignment(date, sections, meta);
+    saveState();
+    return;
+  }
+
   const selectedPersonId = event.target.value;
   const changedRoleId = event.target.dataset.roleId;
   const adjusted = syncLobbyAndRampaSelection(sections, changedRoleId, selectedPersonId);
-  setCurrentAssignment(date, sections);
+  setCurrentAssignment(date, sections, meta);
   saveState();
   if (adjusted) {
     renderAssignment();
@@ -1679,7 +1700,7 @@ function validateCierreLobbyRule(sections, date) {
   return { ok: true };
 }
 
-function upsertAssignment(date, sections) {
+function upsertAssignment(date, sections, meta = {}) {
   const now = new Date().toISOString();
   const existing = getHistoryEntryByDate(date);
   const entry = {
@@ -1688,6 +1709,7 @@ function upsertAssignment(date, sections) {
     guardId: existing?.guardId || state.guardId,
     sections: normalizeSections(sections),
     personSnapshot: snapshotNames(sections),
+    meta: normalizeAssignmentMeta(meta),
     createdAt: existing?.createdAt || now,
     updatedAt: now,
   };
@@ -1736,11 +1758,12 @@ function clearHistoryDatabaseStorage() {
   });
 }
 
-function setCurrentAssignment(date, sections) {
+function setCurrentAssignment(date, sections, meta = {}) {
   state.currentAssignment = {
     date,
     sections: normalizeSections(sections),
     personSnapshot: snapshotNames(sections),
+    meta: normalizeAssignmentMeta(meta),
   };
 }
 
@@ -1755,6 +1778,17 @@ function collectAssignmentFromForm() {
   });
 
   return sections;
+}
+
+function collectAssignmentMetaFromForm() {
+  const meta = normalizeAssignmentMeta(state.currentAssignment?.meta);
+  const inputs = elements.assignmentBoard.querySelectorAll("[data-assignment-meta]");
+
+  inputs.forEach((input) => {
+    meta[input.dataset.assignmentMeta] = input.value || "";
+  });
+
+  return meta;
 }
 
 function syncLobbyAndRampaSelection(sections, changedRoleId, selectedPersonId) {
@@ -2028,8 +2062,29 @@ function createRoleCard(section, role) {
     );
   }
 
+  if (section.id === "principales" && role.id === "cierre_lobby") {
+    slotGrid.appendChild(createLobbyCloseTimeControl());
+  }
+
   roleCard.append(title, slotGrid);
   return roleCard;
+}
+
+function createLobbyCloseTimeControl() {
+  const row = document.createElement("label");
+  row.className = "slot-row role-time-field";
+
+  const text = document.createElement("span");
+  text.textContent = "Horario de cierre";
+
+  const input = document.createElement("input");
+  input.type = "time";
+  input.dataset.assignmentMeta = "lobbyCloseTime";
+  input.value = state.currentAssignment?.meta?.lobbyCloseTime || "";
+  input.setAttribute("aria-label", "Horario de cierre de lobby");
+
+  row.append(text, input);
+  return row;
 }
 
 function updateLobbyEmptyCardStates() {
@@ -2200,6 +2255,11 @@ function createHistoryRole(entry, section, role) {
     });
   } else {
     namesBox.textContent = "-";
+  }
+
+  if (section.id === "principales" && role.id === "cierre_lobby" && entry.meta?.lobbyCloseTime) {
+    namesBox.appendChild(document.createElement("br"));
+    namesBox.appendChild(document.createTextNode(`Horario: ${entry.meta.lobbyCloseTime}`));
   }
 
   roleBox.append(roleName, namesBox);
@@ -2664,6 +2724,7 @@ function cloneEntryAsCurrent(entry) {
     date: entry.date,
     sections: normalizeSections(entry.sections),
     personSnapshot: { ...(entry.personSnapshot || {}) },
+    meta: normalizeAssignmentMeta(entry.meta),
   };
 }
 
