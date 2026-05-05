@@ -164,7 +164,7 @@ function createAdministratorDayCell(date, isCurrentMonth) {
 function renderAdministratorAssignmentPill(name) {
   const person = findAdministratorPerson(name);
   const color = person ? person.color : "#64748b";
-  return `<span class="assignment-pill" style="background:${color}" title="${escapeHtmlAdmin(name)}">${escapeHtmlAdmin(name)}</span>`;
+  return `<span class="assignment-pill" style="background:${color}" title="${escapeHtmlAdmin(name)}">${escapeHtmlAdmin(getAdministratorLastName(name))}</span>`;
 }
 
 async function hydrateAdministratorCalendarFromFirestore() {
@@ -337,6 +337,11 @@ function getAdministratorInitials(name) {
     .map((part) => part[0] || "")
     .join("")
     .toUpperCase();
+}
+
+function getAdministratorLastName(name) {
+  const parts = String(name || "").trim().split(/\s+/).filter(Boolean);
+  return parts.length > 1 ? parts[parts.length - 1] : parts[0] || "";
 }
 
 function formatAdminShortDate(isoDate) {

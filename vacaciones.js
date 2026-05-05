@@ -408,10 +408,10 @@ function createDayCell(date) {
 function renderAssignmentPill(name) {
   const person = findPerson(name);
   const color = person ? person.color : "#64748b";
+  const lastName = getLastName(name);
   return `
     <span class="assignment-pill" style="background:${color}" title="${escapeHtml(name)}">
-      <span class="assignment-name-full">${escapeHtml(name)}</span>
-      <span class="assignment-name-last">${escapeHtml(getLastName(name))}</span>
+      <span class="assignment-name-last">${escapeHtml(lastName)}</span>
     </span>
   `;
 }
