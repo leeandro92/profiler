@@ -1,8 +1,12 @@
 const STORAGE_KEY = "rotador-puestos-v1";
-const SCHEMA_VERSION = 9;
+const SCHEMA_VERSION = 10;
 const ROTATION_START_DATE = "2026-04-27";
 const ASSIGNMENT_META_DEFAULTS = {
+  lobbyStartTime: "",
   lobbyCloseTime: "",
+  boardingStartTime: "",
+  boardingCloseTime: "",
+  pushbackTime: "",
 };
 
 const GENDERS = {
@@ -221,6 +225,18 @@ const DISPLAY_SECTIONS = [
     roleIds: ["llevar_maquina"],
   },
 ];
+
+const DISPLAY_SECTION_TIME_FIELDS = {
+  lobby: [
+    { key: "lobbyStartTime", label: "Inicio de lobby" },
+    { key: "lobbyCloseTime", label: "Cierre de lobby" },
+  ],
+  embarque_block: [
+    { key: "boardingStartTime", label: "Inicio de embarque" },
+    { key: "boardingCloseTime", label: "Cierre de Embarque" },
+    { key: "pushbackTime", label: "Pushback" },
+  ],
+};
 
 const elements = {
   notice: document.querySelector("#notice"),
@@ -2022,6 +2038,12 @@ function createAssignmentSection(displaySection) {
     roleGrid.appendChild(createRoleCard(sourceSection, role));
   });
 
+  const timeControls = createDisplaySectionTimeControls(displaySection.id);
+  if (timeControls) {
+    wrapper.append(header, roleGrid, timeControls);
+    return wrapper;
+  }
+
   wrapper.append(header, roleGrid);
   return wrapper;
 }
@@ -2062,26 +2084,36 @@ function createRoleCard(section, role) {
     );
   }
 
-  if (section.id === "principales" && role.id === "cierre_lobby") {
-    slotGrid.appendChild(createLobbyCloseTimeControl());
-  }
-
   roleCard.append(title, slotGrid);
   return roleCard;
 }
 
-function createLobbyCloseTimeControl() {
+function createDisplaySectionTimeControls(displaySectionId) {
+  const fields = DISPLAY_SECTION_TIME_FIELDS[displaySectionId] || [];
+  if (!fields.length) return null;
+
+  const wrapper = document.createElement("div");
+  wrapper.className = "section-time-grid";
+
+  fields.forEach((field) => {
+    wrapper.appendChild(createAssignmentTimeControl(field));
+  });
+
+  return wrapper;
+}
+
+function createAssignmentTimeControl(field) {
   const row = document.createElement("label");
   row.className = "slot-row role-time-field";
 
   const text = document.createElement("span");
-  text.textContent = "Horario de cierre";
+  text.textContent = field.label;
 
   const input = document.createElement("input");
   input.type = "time";
-  input.dataset.assignmentMeta = "lobbyCloseTime";
-  input.value = state.currentAssignment?.meta?.lobbyCloseTime || "";
-  input.setAttribute("aria-label", "Horario de cierre de lobby");
+  input.dataset.assignmentMeta = field.key;
+  input.value = state.currentAssignment?.meta?.[field.key] || "";
+  input.setAttribute("aria-label", field.label);
 
   row.append(text, input);
   return row;
@@ -2227,6 +2259,7 @@ function createHistoryEntry(entry) {
       const role = sourceSection.roles.find((item) => item.id === roleId);
       roleGrid.appendChild(createHistoryRole(entry, sourceSection, role));
     });
+    appendHistoryTimeRoles(roleGrid, entry, displaySection.id);
 
     sectionBox.append(title, roleGrid);
     sectionList.appendChild(sectionBox);
@@ -2257,13 +2290,29 @@ function createHistoryRole(entry, section, role) {
     namesBox.textContent = "-";
   }
 
-  if (section.id === "principales" && role.id === "cierre_lobby" && entry.meta?.lobbyCloseTime) {
-    namesBox.appendChild(document.createElement("br"));
-    namesBox.appendChild(document.createTextNode(`Horario: ${entry.meta.lobbyCloseTime}`));
-  }
-
   roleBox.append(roleName, namesBox);
   return roleBox;
+}
+
+function appendHistoryTimeRoles(roleGrid, entry, displaySectionId) {
+  const fields = DISPLAY_SECTION_TIME_FIELDS[displaySectionId] || [];
+
+  fields.forEach((field) => {
+    const value = entry.meta?.[field.key];
+    if (!value) return;
+
+    const roleBox = document.createElement("div");
+    roleBox.className = "history-role history-role--time";
+
+    const roleName = document.createElement("strong");
+    roleName.textContent = field.label;
+
+    const time = document.createElement("span");
+    time.textContent = value;
+
+    roleBox.append(roleName, time);
+    roleGrid.appendChild(roleBox);
+  });
 }
 
 function getRotationInfo(date) {

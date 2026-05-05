@@ -1097,6 +1097,21 @@ select:focus {
   text-transform: uppercase;
 }
 
+.section-time-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  padding: 14px;
+  border: 1px dashed rgba(225, 38, 47, 0.22);
+  border-radius: var(--radius);
+  background: linear-gradient(135deg, rgba(225, 38, 47, 0.06), rgba(255, 255, 255, 0.92));
+}
+
+.history-role--time {
+  border-style: dashed;
+  background: linear-gradient(135deg, rgba(225, 38, 47, 0.08), #ffffff);
+}
+
 .assignment-actions {
   display: flex;
   justify-content: flex-end;

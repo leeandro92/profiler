@@ -78,6 +78,18 @@ const DISPLAY_SECTIONS = [
   },
 ];
 
+const DISPLAY_SECTION_TIME_FIELDS = {
+  lobby: [
+    { key: "lobbyStartTime", label: "Inicio de lobby" },
+    { key: "lobbyCloseTime", label: "Cierre de lobby" },
+  ],
+  embarque_block: [
+    { key: "boardingStartTime", label: "Inicio de embarque" },
+    { key: "boardingCloseTime", label: "Cierre de Embarque" },
+    { key: "pushbackTime", label: "Pushback" },
+  ],
+};
+
 const HISTORY_SECTION_THEMES = {
   lobby: { accent: "#e1262f", soft: "#fff1f2", border: "#fecdd3", text: "#9f1239" },
   catering_block: { accent: "#f59e0b", soft: "#fffbeb", border: "#fde68a", text: "#92400e" },
@@ -283,6 +295,7 @@ function buildCanvasRows(history, contentWidth) {
           );
           return { role: role.label, names: getHistoryRoleNames(entry, sourceSection, role, names) };
         });
+        roleRows.push(...getHistoryTimeRows(entry, displaySection.id));
         entryRows.push({ id: displaySection.id, title: displaySection.label, roleRows });
       });
 
@@ -508,6 +521,7 @@ function createHistoryEntry(entry) {
       const role = sourceSection.roles.find((item) => item.id === roleId);
       roleGrid.appendChild(createHistoryRole(entry, sourceSection, role));
     });
+    appendHistoryTimeRoles(roleGrid, entry, displaySection.id);
 
     sectionBox.append(title, roleGrid);
     sectionList.appendChild(sectionBox);
@@ -545,12 +559,34 @@ function createHistoryRole(entry, section, role) {
 
 function getHistoryRoleNames(entry, section, role, names) {
   const displayNames = names.length ? [...names] : ["-"];
-
-  if (section.id === "principales" && role.id === "cierre_lobby" && entry.meta?.lobbyCloseTime) {
-    displayNames.push(`Horario: ${entry.meta.lobbyCloseTime}`);
-  }
-
   return displayNames;
+}
+
+function appendHistoryTimeRoles(roleGrid, entry, displaySectionId) {
+  getHistoryTimeRows(entry, displaySectionId).forEach((row) => {
+    const roleBox = document.createElement("div");
+    roleBox.className = "history-role history-role--time";
+
+    const roleName = document.createElement("strong");
+    roleName.textContent = row.role;
+
+    const time = document.createElement("span");
+    time.textContent = row.names[0];
+
+    roleBox.append(roleName, time);
+    roleGrid.appendChild(roleBox);
+  });
+}
+
+function getHistoryTimeRows(entry, displaySectionId) {
+  const fields = DISPLAY_SECTION_TIME_FIELDS[displaySectionId] || [];
+
+  return fields
+    .map((field) => ({
+      role: field.label,
+      names: entry.meta?.[field.key] ? [entry.meta[field.key]] : [],
+    }))
+    .filter((row) => row.names.length);
 }
 
 function getSection(sectionId) {
