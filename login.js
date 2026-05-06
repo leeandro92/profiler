@@ -33,6 +33,7 @@ const authElements = {
   resetPasswordConfirm: document.querySelector("#resetPasswordConfirm"),
   verificationNotice: document.querySelector("#verificationNotice"),
   closeVerificationNotice: document.querySelector("#closeVerificationNotice"),
+  resendVerificationEmail: document.querySelector("#resendVerificationEmail"),
   passwordToggleButtons: [...document.querySelectorAll("[data-password-toggle]")],
   status: document.querySelector("#authStatus"),
 };
@@ -41,6 +42,8 @@ let firebaseAuth = null;
 let authTools = null;
 let firestoreTools = null;
 let activePasswordResetCode = "";
+let pendingVerificationCredentials = null;
+let isResendingVerificationEmail = false;
 
 initLogin();
 
@@ -81,6 +84,7 @@ function bindAuthForms() {
     button.addEventListener("click", () => togglePasswordVisibility(button));
   });
   authElements.closeVerificationNotice.addEventListener("click", hideVerificationNotice);
+  authElements.resendVerificationEmail?.addEventListener("click", handleResendVerificationEmail);
   authElements.verificationNotice.addEventListener("click", (event) => {
     if (event.target === authElements.verificationNotice) {
       hideVerificationNotice();
@@ -165,6 +169,7 @@ async function handleRegisterSubmit(event) {
     const credentials = await authTools.createUserWithEmailAndPassword(firebaseAuth, email, password);
     await saveUserProfile(credentials.user, { created: true, firstName, lastName, gender });
     await authTools.sendEmailVerification(credentials.user);
+    pendingVerificationCredentials = { email, password };
     await authTools.signOut(firebaseAuth);
     setAuthStatus("Usuario creado correctamente. Te enviamos un email de verificacion. Verifica tu correo antes de iniciar sesion.", "success");
     showVerificationNotice();
@@ -176,6 +181,47 @@ async function handleRegisterSubmit(event) {
     setAuthStatus(getFriendlyAuthError(error), "error");
   } finally {
     setFormsDisabled(false);
+  }
+}
+
+async function handleResendVerificationEmail() {
+  if (!pendingVerificationCredentials) {
+    setAuthStatus("Para reenviar el link, intenta iniciar sesion con el correo registrado. Si falta verificar, te enviamos otro automaticamente.", "error");
+    return;
+  }
+
+  const button = authElements.resendVerificationEmail;
+  button.disabled = true;
+  button.textContent = "Reenviando...";
+  setAuthStatus("Reenviando email de verificacion...", "loading");
+
+  try {
+    isResendingVerificationEmail = true;
+    const credentials = await authTools.signInWithEmailAndPassword(
+      firebaseAuth,
+      pendingVerificationCredentials.email,
+      pendingVerificationCredentials.password,
+    );
+    await credentials.user.reload();
+
+    if (credentials.user.emailVerified) {
+      await authTools.signOut(firebaseAuth);
+      pendingVerificationCredentials = null;
+      hideVerificationNotice();
+      setAuthStatus("El correo ya esta verificado. Ya podes iniciar sesion.", "success");
+      return;
+    }
+
+    await authTools.sendEmailVerification(credentials.user);
+    await authTools.signOut(firebaseAuth);
+    setAuthStatus("Te reenviamos el email de verificacion. Revisa tu bandeja de entrada o spam.", "success");
+  } catch (error) {
+    console.warn("No se pudo reenviar el email de verificacion.", error);
+    setAuthStatus(getFriendlyAuthError(error), "error");
+  } finally {
+    isResendingVerificationEmail = false;
+    button.disabled = false;
+    button.textContent = "Reenviar link";
   }
 }
 
@@ -374,6 +420,8 @@ async function registeredEmailExists(email) {
 function updateSessionState(user) {
   if (user) {
     if (!user.emailVerified) {
+      if (isResendingVerificationEmail) return;
+
       authTools?.signOut(firebaseAuth).catch((error) => {
         console.warn("No se pudo cerrar la sesion no verificada.", error);
       });

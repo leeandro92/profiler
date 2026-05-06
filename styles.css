@@ -2608,6 +2608,25 @@ select:focus-visible {
   justify-content: center;
 }
 
+.verification-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.verification-actions .primary-button,
+.verification-actions .secondary-button {
+  width: 100%;
+  justify-content: center;
+}
+
+@media (max-width: 560px) {
+  .verification-actions {
+    grid-template-columns: 1fr;
+  }
+}
+
 .has-auth-modal {
   overflow: hidden;
 }
