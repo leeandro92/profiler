@@ -40,13 +40,15 @@ body {
   color: var(--ink);
   font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   background:
-    radial-gradient(circle at 10% 8%, rgba(225, 38, 47, 0.23), transparent 31%),
-    radial-gradient(circle at 86% 14%, rgba(24, 24, 27, 0.18), transparent 29%),
-    radial-gradient(circle at 72% 92%, rgba(225, 38, 47, 0.14), transparent 32%),
-    linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(243, 244, 246, 0.9) 46%, rgba(250, 250, 250, 0.98)),
-    linear-gradient(180deg, rgba(24, 24, 27, 0.055), rgba(225, 38, 47, 0.06) 52%, transparent 430px),
+    radial-gradient(circle at 8% -8%, rgba(225, 38, 47, 0.18), transparent 30%),
+    radial-gradient(circle at 94% 4%, rgba(24, 24, 27, 0.14), transparent 28%),
+    radial-gradient(circle at 88% 84%, rgba(225, 38, 47, 0.1), transparent 34%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(248, 250, 252, 0.94) 42%, rgba(244, 244, 245, 0.96)),
+    linear-gradient(180deg, rgba(24, 24, 27, 0.035), transparent 34%, rgba(225, 38, 47, 0.035)),
+    repeating-linear-gradient(135deg, rgba(24, 24, 27, 0.018) 0 1px, transparent 1px 18px),
     var(--bg);
   background-attachment: fixed;
+  background-size: auto, auto, auto, auto, auto, 220px 220px, auto;
 }
 
 button,
