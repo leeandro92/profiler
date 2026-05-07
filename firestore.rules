@@ -2,19 +2,54 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function verified() {
+      return signedIn() && request.auth.token.email_verified == true;
+    }
+
+    function owner() {
+      return verified()
+        && request.auth.token.email in [
+          "lean-nieto.92@hotmail.com",
+          "brestlauraceleste@gmail.com"
+        ];
+    }
+
+    function self(userId) {
+      return signedIn() && request.auth.uid == userId;
+    }
+
+    function ownProfileWrite(userId) {
+      return self(userId)
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.email == request.auth.token.email;
+    }
+
+    function limitedPublicUserLookup() {
+      return request.query.limit != null && request.query.limit <= 26;
+    }
+
     match /profilers_history/{entryId} {
-      allow read, write: if true;
+      allow read, create, update, delete: if owner();
     }
 
     match /profilers_vacations/{entryId} {
-      allow read, write: if true;
+      allow read: if verified();
+      allow create, update, delete: if owner();
     }
 
     match /profilers_auth_users/{userId} {
-      allow create: if request.auth != null && request.auth.uid == userId;
-      allow list: if true;
-      allow read, update: if request.auth != null && request.auth.uid == userId;
+      allow get: if self(userId) || owner();
+      allow list: if owner() || limitedPublicUserLookup();
+      allow create, update: if ownProfileWrite(userId);
       allow delete: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }

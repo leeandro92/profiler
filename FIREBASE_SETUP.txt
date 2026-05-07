@@ -22,8 +22,11 @@ CONFIGURACION RAPIDA DE FIREBASE / FIRESTORE
 8. En Firestore > Reglas, pegar el contenido de firestore.rules y publicar.
 
 IMPORTANTE:
-Las reglas incluidas permiten leer y escribir sin login para que la app funcione facil.
-Si la pagina va a quedar publica, conviene agregar autenticacion para proteger el historial.
+Las reglas incluidas requieren Firebase Authentication.
+El historial queda disponible solo para los administradores configurados.
+Las vacaciones/calendario pueden leerse solo con usuarios verificados.
+Los usuarios pueden crear o actualizar solamente su propio perfil.
+Para que estas reglas funcionen en produccion, hay que publicarlas en Firestore > Reglas.
 
 COLECCION USADA:
 profilers_history

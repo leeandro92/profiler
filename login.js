@@ -402,7 +402,8 @@ async function countRegisteredUsers() {
   }
 
   const usersRef = firestoreTools.collection(firestoreTools.db, AUTH_USERS_COLLECTION);
-  const snapshot = await firestoreTools.getDocs(usersRef);
+  const limitedUsersQuery = firestoreTools.query(usersRef, firestoreTools.limit(MAX_REGISTERED_USERS + 1));
+  const snapshot = await firestoreTools.getDocs(limitedUsersQuery);
   return snapshot.size;
 }
 
