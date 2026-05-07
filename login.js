@@ -169,7 +169,7 @@ async function handleRegisterSubmit(event) {
     setAuthStatus("Creando usuario...", "loading");
     const credentials = await authTools.createUserWithEmailAndPassword(firebaseAuth, email, password);
     await saveUserProfileSafely(credentials.user, { created: true, firstName, lastName, gender });
-    await authTools.sendEmailVerification(credentials.user, getEmailVerificationSettings());
+    await authTools.sendEmailVerification(credentials.user);
     pendingVerificationCredentials = { email, password };
     await authTools.signOut(firebaseAuth);
     setAuthStatus("Usuario creado correctamente. Te enviamos un email de verificacion. Verifica tu correo antes de iniciar sesion.", "success");
@@ -215,7 +215,7 @@ async function handleResendVerificationEmail() {
       return;
     }
 
-    await authTools.sendEmailVerification(credentials.user, getEmailVerificationSettings());
+    await authTools.sendEmailVerification(credentials.user);
     await authTools.signOut(firebaseAuth);
     setVerificationStatus("Listo. Te reenviamos el link. Revisa bandeja de entrada y spam.", "success");
     setAuthStatus("Te reenviamos el email de verificacion. Revisa tu bandeja de entrada o spam.", "success");
@@ -246,7 +246,7 @@ async function handleLoginSubmit(event) {
     await credentials.user.reload();
 
     if (!credentials.user.emailVerified) {
-      await authTools.sendEmailVerification(credentials.user, getEmailVerificationSettings());
+      await authTools.sendEmailVerification(credentials.user);
       await authTools.signOut(firebaseAuth);
       pendingVerificationCredentials = { email, password };
       showVerificationNotice();
@@ -628,6 +628,9 @@ function getFriendlyAuthError(error) {
     "auth/requires-recent-login": "Volve a iniciar sesion para completar esta accion.",
     "auth/expired-action-code": "El enlace de recuperacion vencio. Pedi uno nuevo.",
     "auth/invalid-action-code": "El enlace de recuperacion no es valido o ya fue usado.",
+    "auth/invalid-continue-uri": "Firebase no acepta la URL configurada para el link. Revisa los dominios autorizados en Authentication.",
+    "auth/unauthorized-continue-uri": "El dominio de la pagina no esta autorizado en Firebase Authentication.",
+    "auth/missing-continue-uri": "Falta configurar la URL de retorno para Firebase.",
     "permission-denied": "Firestore bloqueo la operacion. Publica las reglas actualizadas y espera unos segundos antes de intentar nuevamente.",
     "firestore/permission-denied": "Firestore bloqueo la operacion. Publica las reglas actualizadas y espera unos segundos antes de intentar nuevamente.",
   };
@@ -664,15 +667,6 @@ function isBlockedEmail(email) {
 }
 
 function getPasswordResetSettings() {
-  if (!/^https?:$/.test(window.location.protocol)) return undefined;
-
-  return {
-    url: `${window.location.origin}${window.location.pathname}`,
-    handleCodeInApp: false,
-  };
-}
-
-function getEmailVerificationSettings() {
   if (!/^https?:$/.test(window.location.protocol)) return undefined;
 
   return {
