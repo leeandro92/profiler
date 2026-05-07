@@ -534,6 +534,19 @@ button {
 
 .instagram-link {
   margin-top: 1px;
+  color: #e1306c;
+}
+
+.facebook-link {
+  color: #1877f2;
+}
+
+.linkedin-link {
+  color: #0a66c2;
+}
+
+.tiktok-link {
+  color: #25f4ee;
 }
 
 .instagram-link svg,
@@ -558,9 +571,25 @@ button {
 
 .instagram-link:hover,
 .social-link:hover {
-  color: #fecdd3;
+  color: var(--social-hover, currentColor);
   opacity: 0.96;
   transform: translateX(3px);
+}
+
+.instagram-link:hover {
+  --social-hover: #f77737;
+}
+
+.facebook-link:hover {
+  --social-hover: #60a5fa;
+}
+
+.linkedin-link:hover {
+  --social-hover: #38bdf8;
+}
+
+.tiktok-link:hover {
+  --social-hover: #fe2c55;
 }
 
 .instagram-link:hover svg,
