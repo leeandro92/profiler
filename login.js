@@ -596,6 +596,8 @@ function getFriendlyAuthError(error) {
     "auth/requires-recent-login": "Volve a iniciar sesion para completar esta accion.",
     "auth/expired-action-code": "El enlace de recuperacion vencio. Pedi uno nuevo.",
     "auth/invalid-action-code": "El enlace de recuperacion no es valido o ya fue usado.",
+    "permission-denied": "Firestore bloqueo la operacion. Publica las reglas actualizadas e intenta nuevamente.",
+    "firestore/permission-denied": "Firestore bloqueo la operacion. Publica las reglas actualizadas e intenta nuevamente.",
   };
 
   return messages[code] || "No se pudo completar la operacion. Revisa los datos e intenta nuevamente.";

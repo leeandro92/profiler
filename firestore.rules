@@ -25,7 +25,20 @@ service cloud.firestore {
     function ownProfileWrite(userId) {
       return self(userId)
         && request.resource.data.uid == request.auth.uid
-        && request.resource.data.email == request.auth.token.email;
+        && request.resource.data.keys().hasOnly([
+          "uid",
+          "email",
+          "emailKey",
+          "emailVerified",
+          "provider",
+          "createdAt",
+          "updatedAt",
+          "firstName",
+          "lastName",
+          "fullName",
+          "gender",
+          "lastLoginAt"
+        ]);
     }
 
     function limitedPublicUserLookup() {
