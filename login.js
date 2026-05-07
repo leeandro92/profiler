@@ -32,6 +32,7 @@ const authElements = {
   resetPassword: document.querySelector("#resetPassword"),
   resetPasswordConfirm: document.querySelector("#resetPasswordConfirm"),
   verificationNotice: document.querySelector("#verificationNotice"),
+  verificationStatus: document.querySelector("#verificationNoticeStatus"),
   closeVerificationNotice: document.querySelector("#closeVerificationNotice"),
   resendVerificationEmail: document.querySelector("#resendVerificationEmail"),
   passwordToggleButtons: [...document.querySelectorAll("[data-password-toggle]")],
@@ -168,7 +169,7 @@ async function handleRegisterSubmit(event) {
     setAuthStatus("Creando usuario...", "loading");
     const credentials = await authTools.createUserWithEmailAndPassword(firebaseAuth, email, password);
     await saveUserProfileSafely(credentials.user, { created: true, firstName, lastName, gender });
-    await authTools.sendEmailVerification(credentials.user);
+    await authTools.sendEmailVerification(credentials.user, getEmailVerificationSettings());
     pendingVerificationCredentials = { email, password };
     await authTools.signOut(firebaseAuth);
     setAuthStatus("Usuario creado correctamente. Te enviamos un email de verificacion. Verifica tu correo antes de iniciar sesion.", "success");
@@ -186,7 +187,8 @@ async function handleRegisterSubmit(event) {
 
 async function handleResendVerificationEmail() {
   if (!pendingVerificationCredentials) {
-    setAuthStatus("Para reenviar el link, intenta iniciar sesion con el correo registrado. Si falta verificar, te enviamos otro automaticamente.", "error");
+    setVerificationStatus("Para reenviar desde este boton, volve a completar correo y contrasena e intenta iniciar sesion. Si falta verificar, te reenviamos el link automaticamente.", "error");
+    setAuthStatus("Completa correo y contrasena e intenta iniciar sesion para reenviar el link.", "error");
     return;
   }
 
@@ -194,6 +196,7 @@ async function handleResendVerificationEmail() {
   button.disabled = true;
   button.textContent = "Reenviando...";
   setAuthStatus("Reenviando email de verificacion...", "loading");
+  setVerificationStatus("Reenviando link de verificacion...", "loading");
 
   try {
     isResendingVerificationEmail = true;
@@ -212,11 +215,13 @@ async function handleResendVerificationEmail() {
       return;
     }
 
-    await authTools.sendEmailVerification(credentials.user);
+    await authTools.sendEmailVerification(credentials.user, getEmailVerificationSettings());
     await authTools.signOut(firebaseAuth);
+    setVerificationStatus("Listo. Te reenviamos el link. Revisa bandeja de entrada y spam.", "success");
     setAuthStatus("Te reenviamos el email de verificacion. Revisa tu bandeja de entrada o spam.", "success");
   } catch (error) {
     console.warn("No se pudo reenviar el email de verificacion.", error);
+    setVerificationStatus(getFriendlyAuthError(error), "error");
     setAuthStatus(getFriendlyAuthError(error), "error");
   } finally {
     isResendingVerificationEmail = false;
@@ -241,8 +246,11 @@ async function handleLoginSubmit(event) {
     await credentials.user.reload();
 
     if (!credentials.user.emailVerified) {
-      await authTools.sendEmailVerification(credentials.user);
+      await authTools.sendEmailVerification(credentials.user, getEmailVerificationSettings());
       await authTools.signOut(firebaseAuth);
+      pendingVerificationCredentials = { email, password };
+      showVerificationNotice();
+      setVerificationStatus("Te reenviamos el link. Revisa bandeja de entrada y spam.", "success");
       setAuthStatus("Tu correo todavia no esta verificado. Te reenviamos el email de verificacion.", "error");
       return;
     }
@@ -589,11 +597,18 @@ function showAuthView(view, options = {}) {
 function showVerificationNotice() {
   authElements.verificationNotice.classList.remove("is-hidden");
   document.body.classList.add("has-auth-modal");
+  setVerificationStatus("Si no llego, espera unos segundos y toca reenviar.", "neutral");
 }
 
 function hideVerificationNotice() {
   authElements.verificationNotice.classList.add("is-hidden");
   document.body.classList.remove("has-auth-modal");
+}
+
+function setVerificationStatus(message, type = "neutral") {
+  if (!authElements.verificationStatus) return;
+  authElements.verificationStatus.textContent = message;
+  authElements.verificationStatus.dataset.status = type;
 }
 
 function getFriendlyAuthError(error) {
@@ -649,6 +664,15 @@ function isBlockedEmail(email) {
 }
 
 function getPasswordResetSettings() {
+  if (!/^https?:$/.test(window.location.protocol)) return undefined;
+
+  return {
+    url: `${window.location.origin}${window.location.pathname}`,
+    handleCodeInApp: false,
+  };
+}
+
+function getEmailVerificationSettings() {
   if (!/^https?:$/.test(window.location.protocol)) return undefined;
 
   return {
