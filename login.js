@@ -169,11 +169,19 @@ async function handleRegisterSubmit(event) {
     setAuthStatus("Creando usuario...", "loading");
     const credentials = await authTools.createUserWithEmailAndPassword(firebaseAuth, email, password);
     await saveUserProfileSafely(credentials.user, { created: true, firstName, lastName, gender });
-    await authTools.sendEmailVerification(credentials.user);
     pendingVerificationCredentials = { email, password };
+    const verificationResult = await sendVerificationEmailSafely(credentials.user);
     await authTools.signOut(firebaseAuth);
-    setAuthStatus("Usuario creado correctamente. Te enviamos un email de verificacion. Verifica tu correo antes de iniciar sesion.", "success");
+    setAuthStatus(
+      verificationResult.ok
+        ? "Usuario creado correctamente. Te enviamos un email de verificacion. Verifica tu correo antes de iniciar sesion."
+        : "Usuario creado correctamente, pero no pudimos enviar el email de verificacion. Usa Reenviar link.",
+      verificationResult.ok ? "success" : "error",
+    );
     showVerificationNotice();
+    if (!verificationResult.ok) {
+      setVerificationStatus(getFriendlyAuthError(verificationResult.error), "error");
+    }
     authElements.registerForm.reset();
     authElements.loginEmail.value = email;
     showAuthView("login", { keepStatus: true });
@@ -215,7 +223,7 @@ async function handleResendVerificationEmail() {
       return;
     }
 
-    await authTools.sendEmailVerification(credentials.user);
+    await sendVerificationEmailWithFallback(credentials.user);
     await authTools.signOut(firebaseAuth);
     setVerificationStatus("Listo. Te reenviamos el link. Revisa bandeja de entrada y spam.", "success");
     setAuthStatus("Te reenviamos el email de verificacion. Revisa tu bandeja de entrada o spam.", "success");
@@ -246,12 +254,22 @@ async function handleLoginSubmit(event) {
     await credentials.user.reload();
 
     if (!credentials.user.emailVerified) {
-      await authTools.sendEmailVerification(credentials.user);
-      await authTools.signOut(firebaseAuth);
       pendingVerificationCredentials = { email, password };
+      const verificationResult = await sendVerificationEmailSafely(credentials.user);
+      await authTools.signOut(firebaseAuth);
       showVerificationNotice();
-      setVerificationStatus("Te reenviamos el link. Revisa bandeja de entrada y spam.", "success");
-      setAuthStatus("Tu correo todavia no esta verificado. Te reenviamos el email de verificacion.", "error");
+      setVerificationStatus(
+        verificationResult.ok
+          ? "Te reenviamos el link. Revisa bandeja de entrada y spam."
+          : getFriendlyAuthError(verificationResult.error),
+        verificationResult.ok ? "success" : "error",
+      );
+      setAuthStatus(
+        verificationResult.ok
+          ? "Tu correo todavia no esta verificado. Te reenviamos el email de verificacion."
+          : "Tu correo todavia no esta verificado y Firebase no pudo reenviar el link.",
+        "error",
+      );
       return;
     }
 
@@ -443,6 +461,53 @@ async function registeredEmailExists(email) {
   return !snapshot.empty;
 }
 
+async function sendVerificationEmailSafely(user) {
+  try {
+    await sendVerificationEmailWithFallback(user);
+    return { ok: true };
+  } catch (error) {
+    console.warn("No se pudo enviar el email de verificacion.", error);
+    return { ok: false, error };
+  }
+}
+
+async function sendVerificationEmailWithFallback(user) {
+  if (!user) throw new Error("No hay usuario para verificar.");
+
+  try {
+    await authTools.sendEmailVerification(user);
+    return;
+  } catch (sdkError) {
+    console.warn("Fallo sendEmailVerification del SDK. Se intenta REST.", sdkError);
+    await sendVerificationEmailWithRestFallback(user, sdkError);
+  }
+}
+
+async function sendVerificationEmailWithRestFallback(user, originalError) {
+  const apiKey = window.FirebaseAppConfig?.firebaseConfig?.apiKey;
+  if (!apiKey) throw originalError || new Error("No hay apiKey de Firebase.");
+
+  const idToken = await user.getIdToken(true);
+  const response = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=${encodeURIComponent(apiKey)}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      requestType: "VERIFY_EMAIL",
+      idToken,
+    }),
+  });
+
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    const restError = new Error(payload?.error?.message || `Firebase REST ${response.status}`);
+    restError.code = `firebase-rest/${payload?.error?.message || response.status}`;
+    restError.originalError = originalError;
+    throw restError;
+  }
+}
+
 function updateSessionState(user) {
   if (user) {
     if (!user.emailVerified) {
@@ -631,11 +696,14 @@ function getFriendlyAuthError(error) {
     "auth/invalid-continue-uri": "Firebase no acepta la URL configurada para el link. Revisa los dominios autorizados en Authentication.",
     "auth/unauthorized-continue-uri": "El dominio de la pagina no esta autorizado en Firebase Authentication.",
     "auth/missing-continue-uri": "Falta configurar la URL de retorno para Firebase.",
+    "firebase-rest/TOO_MANY_ATTEMPTS_TRY_LATER": "Firebase bloqueo temporalmente el reenvio por demasiados intentos. Espera unos minutos y volve a probar.",
+    "firebase-rest/INVALID_ID_TOKEN": "La sesion temporal vencio. Volve a escribir correo y contrasena para reenviar el link.",
+    "firebase-rest/USER_NOT_FOUND": "No existe un usuario para reenviar verificacion.",
     "permission-denied": "Firestore bloqueo la operacion. Publica las reglas actualizadas y espera unos segundos antes de intentar nuevamente.",
     "firestore/permission-denied": "Firestore bloqueo la operacion. Publica las reglas actualizadas y espera unos segundos antes de intentar nuevamente.",
   };
 
-  return messages[code] || "No se pudo completar la operacion. Revisa los datos e intenta nuevamente.";
+  return messages[code] || `No se pudo completar la operacion. Codigo: ${code || error?.message || "desconocido"}.`;
 }
 
 function hasValidFirebaseConfig(config) {
