@@ -158,16 +158,16 @@ async function handleRegisterSubmit(event) {
   setAuthStatus("Verificando cupo de usuarios...", "loading");
 
   try {
-    const registeredUsersCount = await countRegisteredUsers();
+    const registeredUsersCount = await countRegisteredUsersSafely();
 
-    if (registeredUsersCount >= MAX_REGISTERED_USERS) {
+    if (Number.isFinite(registeredUsersCount) && registeredUsersCount >= MAX_REGISTERED_USERS) {
       setAuthStatus(`Ya se alcanzo el limite de ${MAX_REGISTERED_USERS} usuarios registrados.`, "error");
       return;
     }
 
     setAuthStatus("Creando usuario...", "loading");
     const credentials = await authTools.createUserWithEmailAndPassword(firebaseAuth, email, password);
-    await saveUserProfile(credentials.user, { created: true, firstName, lastName, gender });
+    await saveUserProfileSafely(credentials.user, { created: true, firstName, lastName, gender });
     await authTools.sendEmailVerification(credentials.user);
     pendingVerificationCredentials = { email, password };
     await authTools.signOut(firebaseAuth);
@@ -247,7 +247,7 @@ async function handleLoginSubmit(event) {
       return;
     }
 
-    await saveUserProfile(credentials.user, { login: true });
+    await saveUserProfileSafely(credentials.user, { login: true });
     authElements.loginForm.reset();
 
     if (LOGIN_OWNER_EMAILS.has(normalizeEmail(credentials.user.email))) {
@@ -405,6 +405,23 @@ async function countRegisteredUsers() {
   const limitedUsersQuery = firestoreTools.query(usersRef, firestoreTools.limit(MAX_REGISTERED_USERS + 1));
   const snapshot = await firestoreTools.getDocs(limitedUsersQuery);
   return snapshot.size;
+}
+
+async function countRegisteredUsersSafely() {
+  try {
+    return await countRegisteredUsers();
+  } catch (error) {
+    console.warn("No se pudo validar el cupo en Firestore. Se continua con Firebase Auth.", error);
+    return null;
+  }
+}
+
+async function saveUserProfileSafely(user, options = {}) {
+  try {
+    await saveUserProfile(user, options);
+  } catch (error) {
+    console.warn("No se pudo guardar el perfil en Firestore. La autenticacion continua.", error);
+  }
 }
 
 async function registeredEmailExists(email) {
