@@ -465,13 +465,6 @@ function handleDayPointerUp() {
 
   if (selectionMoved) {
     suppressNextDayClick = true;
-    const conflicts = findDateConflicts(startDate.value, endDate.value);
-    if (conflicts.length) {
-      showStatus(`${buildConflictMessage(conflicts)} Seleccioná el rango nuevamente.`, "error");
-      clearRangeSelection();
-      return;
-    }
-
     showStatus(`Rango seleccionado: ${formatDisplayDate(startDate.value)} al ${formatDisplayDate(endDate.value)}.`, "success");
   }
 }
@@ -545,13 +538,6 @@ function handleVacationSubmit(event) {
     return;
   }
 
-  const conflicts = findDateConflicts(from, to);
-  if (conflicts.length) {
-    showStatus(buildConflictMessage(conflicts), "error");
-    clearRangeSelection();
-    return;
-  }
-
   addVacationRange(person, from, to);
   const summary = addSummary(person, from, to);
   visibleSummaryIds.add(summary.id);
@@ -576,13 +562,6 @@ function assignSelectedDay() {
   const validation = validateAssignment(person, selectedDialogDate, selectedDialogDate);
   if (!validation.valid) {
     showStatus(validation.message, "error");
-    return;
-  }
-
-  const conflicts = findDateConflicts(selectedDialogDate, selectedDialogDate);
-  if (conflicts.length) {
-    showStatus(buildConflictMessage(conflicts), "error");
-    clearRangeSelection();
     return;
   }
 
@@ -766,9 +745,6 @@ function validateAssignment(person, from, to, options = {}) {
   if (new Date(`${to}T00:00:00`) < new Date(`${from}T00:00:00`)) {
     return { valid: false, message: "La fecha final no puede ser anterior a la inicial." };
   }
-
-  const spacingValidation = validatePersonVacationSpacing(person, from, to, options.ignoreSummaryId);
-  if (!spacingValidation.valid) return spacingValidation;
 
   return { valid: true };
 }
