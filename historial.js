@@ -26,7 +26,7 @@ const SECTIONS = [
       { id: "armado_sala", label: "Armado de sala" },
       { id: "documentacion", label: "Documentacion" },
       { id: "etd", label: "ETD" },
-      { id: "selective", label: "Selective" },
+      { id: "selective", label: "Selectee" },
       { id: "mesa", label: "Mesa" },
       { id: "llevar_maquina", label: "Desarme de ETD" },
     ],

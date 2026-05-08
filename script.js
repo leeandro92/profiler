@@ -152,7 +152,7 @@ const SECTIONS = [
   {
     id: "embarque",
     label: "Embarque",
-    note: "Selective exige una mujer y un hombre configurados. Mesa recibe el resto del equipo activo.",
+    note: "Selectee exige una mujer y un hombre configurados. Mesa recibe el resto del equipo activo.",
     roles: [
       {
         id: "armado_sala",
@@ -166,7 +166,7 @@ const SECTIONS = [
       { id: "etd", label: "ETD", slots: 1 },
       {
         id: "selective",
-        label: "Selective",
+        label: "Selectee",
         slots: 2,
         slotRequirements: [
           { label: "Mujer", gender: "mujer" },
@@ -218,7 +218,7 @@ const DISPLAY_SECTIONS = [
   {
     id: "embarque_block",
     label: "Embarque",
-    note: "Mesa recibe a quienes no estan en Documentacion, ETD o Selective.",
+    note: "Mesa recibe a quienes no estan en Documentacion, ETD o Selectee.",
     sourceSectionId: "embarque",
     roleIds: ["documentacion", "etd", "selective", "mesa"],
   },
@@ -819,7 +819,7 @@ function validateGenerationRequirements(date) {
     return {
       ok: false,
       message:
-        "Selective necesita una persona configurada como mujer y una como hombre dentro de las personas disponibles.",
+        "Selectee necesita una persona configurada como mujer y una como hombre dentro de las personas disponibles.",
     };
   }
 
@@ -1526,7 +1526,7 @@ function validateManualAssignment(sections, date) {
         if (!genders.includes("mujer") || !genders.includes("hombre")) {
           return {
             ok: false,
-            message: "Selective debe tener obligatoriamente una mujer y un hombre configurados.",
+            message: "Selectee debe tener obligatoriamente una mujer y un hombre configurados.",
           };
         }
       }
@@ -2923,7 +2923,7 @@ function buildRestrictionLabel(person) {
   const labels = [];
   if (person.blockedRoles.includes("embarque.etd")) labels.push("No ETD");
   if (person.blockedRoles.includes("principales.catering")) labels.push("No Catering");
-  if (person.gender === "otro") labels.push("Selective sin configurar");
+  if (person.gender === "otro") labels.push("Selectee sin configurar");
   return labels.length ? labels.join(" - ") : "Sin restricciones";
 }
 
