@@ -2240,7 +2240,6 @@ function createAssignmentTimeControl(field) {
     input.min = String(field.min);
     input.max = String(field.max);
     input.inputMode = "numeric";
-    input.placeholder = `${field.min}-${field.max}`;
   } else {
     input.type = "time";
   }
