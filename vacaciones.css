@@ -1619,16 +1619,53 @@ label {
     grid-template-columns: 1fr;
   }
 
-  .vacation-search-panel {
+  .workspace {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .calendar-section,
+  .side-panel {
+    display: contents;
+  }
+
+  .calendar-toolbar {
     order: 1;
+    border: 1px solid var(--line);
+    border-bottom: 0;
+    border-radius: var(--radius) var(--radius) 0 0;
+  }
+
+  .weekday-row {
+    order: 2;
+    border-right: 1px solid var(--line);
+    border-left: 1px solid var(--line);
+    background: var(--surface-strong);
+  }
+
+  .calendar-grid {
+    order: 3;
+    margin-bottom: 0;
+    border: 1px solid var(--line);
+    border-top: 0;
+    border-radius: 0 0 var(--radius) var(--radius);
+    background: var(--surface);
   }
 
   .side-panel > .panel-block:not(.vacation-search-panel):not(.profilers-panel) {
-    order: 2;
+    order: 4;
+  }
+
+  .vacation-search-panel {
+    order: 5;
+  }
+
+  .summary-section {
+    order: 6;
   }
 
   .profilers-panel {
-    order: 99;
+    order: 7;
   }
 
   .calendar-toolbar {
