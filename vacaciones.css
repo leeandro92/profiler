@@ -1619,6 +1619,18 @@ label {
     grid-template-columns: 1fr;
   }
 
+  .vacation-search-panel {
+    order: 1;
+  }
+
+  .profilers-panel {
+    order: 2;
+  }
+
+  .side-panel > .panel-block:not(.vacation-search-panel):not(.profilers-panel) {
+    order: 3;
+  }
+
   .calendar-toolbar {
     gap: 10px;
   }
