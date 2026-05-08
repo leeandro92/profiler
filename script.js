@@ -576,6 +576,18 @@ function handleManualAssignmentChange(event) {
 
   const selectedPersonId = event.target.value;
   const changedRoleId = event.target.dataset.roleId;
+  const changedSectionId = event.target.dataset.sectionId;
+
+  if (isRepeatedLobbyBaseSelection(sections, changedSectionId, changedRoleId, selectedPersonId)) {
+    event.target.value = "";
+    const correctedSections = collectAssignmentFromForm();
+    setCurrentAssignment(date, correctedSections, meta);
+    saveState();
+    updateLobbyEmptyCardStates();
+    showNotice("Esta persona esta en otro puesto.", "error");
+    return;
+  }
+
   const adjusted = syncLobbyAndRampaSelection(sections, changedRoleId, selectedPersonId);
   setCurrentAssignment(date, sections, meta);
   saveState();
@@ -584,6 +596,21 @@ function handleManualAssignmentChange(event) {
   } else {
     updateLobbyEmptyCardStates();
   }
+}
+
+function isRepeatedLobbyBaseSelection(sections, sectionId, roleId, personId) {
+  if (!personId || sectionId !== "principales" || !LOBBY_BASE_ROLE_IDS.includes(roleId)) {
+    return false;
+  }
+
+  let occurrences = 0;
+  LOBBY_BASE_ROLE_IDS.forEach((lobbyRoleId) => {
+    (sections.principales?.[lobbyRoleId] || []).forEach((assignedId) => {
+      if (assignedId === personId) occurrences += 1;
+    });
+  });
+
+  return occurrences > 1;
 }
 
 function handleResetGuard() {
