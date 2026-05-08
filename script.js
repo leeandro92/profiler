@@ -45,7 +45,7 @@ const GROUPS = [
         gender: "mujer",
         blockedRoles: ["embarque.etd", "principales.catering"],
       },
-      { id: "g1-charlie", name: "Charlie", gender: "hombre", operational: false },
+      { id: "g1-charlie", name: "Castillo", gender: "hombre", operational: false },
     ],
   },
   {
