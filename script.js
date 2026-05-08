@@ -143,7 +143,7 @@ const SECTIONS = [
       { id: "manifiesto", label: "Manifiesto", slots: 1, supplemental: true },
       { id: "cierre_lobby", label: "Cierre de lobby", slots: 1, supplemental: true },
       { id: "rampa", label: "Rampa", slots: 2, optional: true, partial: true },
-      { id: "chequeo_avion", label: "Chequeo del avion", slots: 4, supplemental: true, partial: true },
+      { id: "chequeo_avion", label: "Chequeo del avion", slots: 6, supplemental: true, partial: true },
     ],
   },
   {
@@ -2158,7 +2158,7 @@ function createAssignmentSection(displaySection) {
   const sourceSection = getSection(displaySection.sourceSectionId);
   displaySection.roleIds.forEach((roleId) => {
     const role = sourceSection.roles.find((item) => item.id === roleId);
-    roleGrid.appendChild(createRoleCard(sourceSection, role));
+    roleGrid.appendChild(createRoleCard(sourceSection, role, displaySection.id));
   });
 
   const timeControls = createDisplaySectionTimeControls(displaySection.id);
@@ -2171,7 +2171,7 @@ function createAssignmentSection(displaySection) {
   return wrapper;
 }
 
-function createRoleCard(section, role) {
+function createRoleCard(section, role, displaySectionId) {
   const roleCard = document.createElement("section");
   roleCard.className = "role-card";
   roleCard.dataset.sectionId = section.id;
@@ -2191,7 +2191,7 @@ function createRoleCard(section, role) {
   const assignedIds =
     state.currentAssignment.sections?.[section.id]?.[role.id] || [];
   const slotCount = role.fillRest
-    ? Math.max(assignedIds.length, getPeopleForManualSelect(state.currentAssignment.date).length)
+    ? Math.max(assignedIds.length, getPeopleForManualSelect(state.currentAssignment.date, displaySectionId).length)
     : role.slots;
   applyLobbyEmptyCardState(roleCard, section, role, assignedIds, slotCount);
   const requirements = getSlotRequirements(role);
@@ -2205,7 +2205,7 @@ function createRoleCard(section, role) {
 
   for (let index = 0; index < slotCount; index += 1) {
     slotGrid.appendChild(
-      createSlotSelect(section, role, index, assignedIds[index] || "", requirements[index]),
+      createSlotSelect(section, role, index, assignedIds[index] || "", requirements[index], displaySectionId),
     );
   }
 
@@ -2283,7 +2283,7 @@ function applyLobbyEmptyCardState(roleCard, section, role, assignedIds, slotCoun
   roleCard.classList.add(role.id === "sublos" || role.id === "exit2" ? "is-empty-optional" : "is-empty-required");
 }
 
-function createSlotSelect(section, role, index, selectedId, requirement = {}) {
+function createSlotSelect(section, role, index, selectedId, requirement = {}, displaySectionId = "") {
   const row = document.createElement("label");
   row.className = "slot-row";
 
@@ -2300,7 +2300,7 @@ function createSlotSelect(section, role, index, selectedId, requirement = {}) {
   select.appendChild(emptyOption);
 
   const roleKey = getRoleKey(section.id, role.id);
-  const peopleOptions = getPeopleForManualSelect(state.currentAssignment.date);
+  const peopleOptions = getPeopleForManualSelect(state.currentAssignment.date, displaySectionId);
   peopleOptions.forEach((person) => {
     const option = document.createElement("option");
     option.value = person.id;
@@ -2320,8 +2320,11 @@ function createSlotSelect(section, role, index, selectedId, requirement = {}) {
   return row;
 }
 
-function getPeopleForManualSelect(date) {
-  return getActivePeople(date)
+function getPeopleForManualSelect(date, displaySectionId = "") {
+  const includeSupervisors = ["lobby", "armado_block", "embarque_block", "maquina_block"].includes(displaySectionId);
+  const people = includeSupervisors ? getPresentPeople(date) : getActivePeople(date);
+
+  return people
     .slice()
     .sort((a, b) => a.name.localeCompare(b.name, "es"));
 }
