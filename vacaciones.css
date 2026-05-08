@@ -1623,12 +1623,12 @@ label {
     order: 1;
   }
 
-  .profilers-panel {
+  .side-panel > .panel-block:not(.vacation-search-panel):not(.profilers-panel) {
     order: 2;
   }
 
-  .side-panel > .panel-block:not(.vacation-search-panel):not(.profilers-panel) {
-    order: 3;
+  .profilers-panel {
+    order: 99;
   }
 
   .calendar-toolbar {
