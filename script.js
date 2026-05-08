@@ -2297,20 +2297,25 @@ function createSlotSelect(section, role, index, selectedId, requirement = {}, di
   peopleOptions.forEach((person) => {
     const option = document.createElement("option");
     option.value = person.id;
-    option.textContent = `${person.name} (${role.label})`;
+    option.textContent = formatManualPersonOption(person);
     select.appendChild(option);
   });
 
   if (selectedId && !peopleOptions.some((person) => person.id === selectedId)) {
     const missingOption = document.createElement("option");
     missingOption.value = selectedId;
-    missingOption.textContent = `${getPersonName(selectedId)} (${role.label})`;
+    missingOption.textContent = formatManualPersonOption(getPersonForDate(selectedId, state.currentAssignment.date));
     select.appendChild(missingOption);
   }
 
   select.value = selectedId;
   row.appendChild(select);
   return row;
+}
+
+function formatManualPersonOption(person) {
+  if (!person) return "";
+  return canUseRole(person, "embarque.etd") ? `${person.name} (etd)` : person.name;
 }
 
 function getPeopleForManualSelect(date, displaySectionId = "") {
