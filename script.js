@@ -125,6 +125,7 @@ const LOBBY_CIERRE_SOURCE_ROLE_IDS = [...LOBBY_BASE_ROLE_IDS, "manifiesto"];
 const ARMADO_LOBBY_PRIORITY_ROLE_IDS = ["documentacion", "exit", "sublos"];
 const MANIFESTO_PRIMARY_ROLE_IDS = ["exit2", "documentacion", "sublos"];
 const MANIFESTO_SUPERVISOR_IDS = ["g1-charlie", "g2-lau-brest", "g3-lau-romero"];
+const EMBARQUE_DISPLAY_TOTAL_SLOTS = 15;
 
 const SECTIONS = [
   {
@@ -2190,9 +2191,7 @@ function createRoleCard(section, role, displaySectionId) {
 
   const assignedIds =
     state.currentAssignment.sections?.[section.id]?.[role.id] || [];
-  const slotCount = role.fillRest
-    ? Math.max(assignedIds.length, getPeopleForManualSelect(state.currentAssignment.date, displaySectionId).length)
-    : role.slots;
+  const slotCount = getRoleCardSlotCount(section, role, displaySectionId, assignedIds);
   applyLobbyEmptyCardState(roleCard, section, role, assignedIds, slotCount);
   const requirements = getSlotRequirements(role);
 
@@ -2211,6 +2210,26 @@ function createRoleCard(section, role, displaySectionId) {
 
   roleCard.append(title, slotGrid);
   return roleCard;
+}
+
+function getRoleCardSlotCount(section, role, displaySectionId, assignedIds) {
+  if (displaySectionId === "embarque_block" && section.id === "embarque" && role.id === "mesa") {
+    const fixedSlots = getDisplaySectionFixedSlotCount(displaySectionId);
+    return Math.max(assignedIds.length, EMBARQUE_DISPLAY_TOTAL_SLOTS - fixedSlots);
+  }
+
+  return role.fillRest ? assignedIds.length : role.slots;
+}
+
+function getDisplaySectionFixedSlotCount(displaySectionId) {
+  const displaySection = DISPLAY_SECTIONS.find((section) => section.id === displaySectionId);
+  if (!displaySection) return 0;
+
+  const sourceSection = getSection(displaySection.sourceSectionId);
+  return displaySection.roleIds.reduce((total, roleId) => {
+    const role = sourceSection.roles.find((item) => item.id === roleId);
+    return total + (!role || role.fillRest ? 0 : role.slots || 0);
+  }, 0);
 }
 
 function createDisplaySectionTimeControls(displaySectionId) {
