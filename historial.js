@@ -82,11 +82,13 @@ const DISPLAY_SECTION_TIME_FIELDS = {
   lobby: [
     { key: "lobbyStartTime", label: "Inicio de lobby" },
     { key: "lobbyCloseTime", label: "Cierre de lobby" },
+    { key: "paxTotal", label: "Pax Total" },
   ],
   embarque_block: [
     { key: "boardingStartTime", label: "Inicio de embarque" },
     { key: "boardingCloseTime", label: "Cierre de Embarque" },
     { key: "pushbackTime", label: "Pushback" },
+    { key: "selecteeTotal", label: "Selectee" },
   ],
 };
 

@@ -7,6 +7,8 @@ const ASSIGNMENT_META_DEFAULTS = {
   boardingStartTime: "",
   boardingCloseTime: "",
   pushbackTime: "",
+  paxTotal: "",
+  selecteeTotal: "",
 };
 
 const GENDERS = {
@@ -230,11 +232,13 @@ const DISPLAY_SECTION_TIME_FIELDS = {
   lobby: [
     { key: "lobbyStartTime", label: "Inicio de lobby" },
     { key: "lobbyCloseTime", label: "Cierre de lobby" },
+    { key: "paxTotal", label: "Pax Total", type: "numberSelect", min: 1, max: 300 },
   ],
   embarque_block: [
     { key: "boardingStartTime", label: "Inicio de embarque" },
     { key: "boardingCloseTime", label: "Cierre de Embarque" },
     { key: "pushbackTime", label: "Pushback" },
+    { key: "selecteeTotal", label: "Selectee", type: "numberSelect", min: 1, max: 40 },
   ],
 };
 
@@ -562,13 +566,13 @@ function getSaveConfirmationModal() {
 }
 
 function handleManualAssignmentChange(event) {
-  if (!event.target.matches("select[data-section-id], input[data-assignment-meta]") || !state.currentAssignment) return;
+  if (!event.target.matches("select[data-section-id], [data-assignment-meta]") || !state.currentAssignment) return;
 
   const date = state.currentAssignment.date;
   const sections = collectAssignmentFromForm();
   const meta = collectAssignmentMetaFromForm();
 
-  if (event.target.matches("input[data-assignment-meta]")) {
+  if (event.target.matches("[data-assignment-meta]")) {
     setCurrentAssignment(date, sections, meta);
     saveState();
     return;
@@ -2230,8 +2234,22 @@ function createAssignmentTimeControl(field) {
   const text = document.createElement("span");
   text.textContent = field.label;
 
-  const input = document.createElement("input");
-  input.type = "time";
+  const input = field.type === "numberSelect" ? document.createElement("select") : document.createElement("input");
+  if (field.type === "numberSelect") {
+    const emptyOption = document.createElement("option");
+    emptyOption.value = "";
+    emptyOption.textContent = "Seleccionar";
+    input.appendChild(emptyOption);
+
+    for (let value = field.min; value <= field.max; value += 1) {
+      const option = document.createElement("option");
+      option.value = String(value);
+      option.textContent = String(value);
+      input.appendChild(option);
+    }
+  } else {
+    input.type = "time";
+  }
   input.dataset.assignmentMeta = field.key;
   input.value = state.currentAssignment?.meta?.[field.key] || "";
   input.setAttribute("aria-label", field.label);
