@@ -426,7 +426,6 @@ function saveState() {
 
 function handleGenerateAssignment() {
   const date = elements.assignmentDate.value || getToday();
-  const validation = validateGenerationRequirements(date);
 
   const existing = state.history.find((entry) => entry.date === date);
   if (existing) {
@@ -436,20 +435,11 @@ function handleGenerateAssignment() {
     if (!confirmed) return;
   }
 
-  const generated = generateFullAssignment(date);
-  setCurrentAssignment(date, generated.sections);
+  setCurrentAssignment(date, createEmptyFullAssignment());
   saveState();
   render();
 
-  if (!validation.ok || generated.warnings.length) {
-    showNotice(
-      `Asignacion parcial generada para ${formatDate(date)}. Completa o ajusta manualmente los puestos disponibles.`,
-      "success",
-    );
-    return;
-  }
-
-  showNotice(`Asignacion generada para ${formatDate(date)}. Revisa los puestos y guarda los cambios para mostrarla en el historial.`, "success");
+  showNotice(`Puestos listos para ${formatDate(date)}. Completa la asignacion manualmente y guarda los cambios.`, "success");
 }
 
 async function handleSaveManualAssignment(event) {
@@ -1429,6 +1419,8 @@ function buildNoCandidateMessage(section, role, requiredGender = null, requiredR
 }
 
 function validateManualAssignment(sections, date) {
+  return { ok: true };
+
   const activePeople = getActivePeople(date);
   const activeIds = activePeople.map((person) => person.id);
   for (const section of SECTIONS) {
@@ -2145,7 +2137,9 @@ function createRoleCard(section, role) {
 
   const assignedIds =
     state.currentAssignment.sections?.[section.id]?.[role.id] || [];
-  const slotCount = role.fillRest ? assignedIds.length : role.slots;
+  const slotCount = role.fillRest
+    ? Math.max(assignedIds.length, getPeopleForManualSelect(state.currentAssignment.date).length)
+    : role.slots;
   applyLobbyEmptyCardState(roleCard, section, role, assignedIds, slotCount);
   const requirements = getSlotRequirements(role);
 
