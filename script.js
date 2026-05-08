@@ -126,6 +126,8 @@ const ARMADO_LOBBY_PRIORITY_ROLE_IDS = ["documentacion", "exit", "sublos"];
 const MANIFESTO_PRIMARY_ROLE_IDS = ["exit2", "documentacion", "sublos"];
 const MANIFESTO_SUPERVISOR_IDS = ["g1-charlie", "g2-lau-brest", "g3-lau-romero"];
 const EMBARQUE_DISPLAY_TOTAL_SLOTS = 15;
+const MESA_MANUAL_EXTRA_SLOTS = 2;
+const MANUAL_PERSON_PREFIX = "manual:";
 
 const SECTIONS = [
   {
@@ -567,13 +569,19 @@ function getSaveConfirmationModal() {
 }
 
 function handleManualAssignmentChange(event) {
-  if (!event.target.matches("select[data-section-id], [data-assignment-meta]") || !state.currentAssignment) return;
+  if (!event.target.matches("select[data-section-id], input[data-manual-person], [data-assignment-meta]") || !state.currentAssignment) return;
 
   const date = state.currentAssignment.date;
   const sections = collectAssignmentFromForm();
   const meta = collectAssignmentMetaFromForm();
 
   if (event.target.matches("[data-assignment-meta]")) {
+    setCurrentAssignment(date, sections, meta);
+    saveState();
+    return;
+  }
+
+  if (event.target.matches("input[data-manual-person]")) {
     setCurrentAssignment(date, sections, meta);
     saveState();
     return;
@@ -590,6 +598,15 @@ function handleManualAssignmentChange(event) {
     setCurrentAssignment(date, correctedSections, meta);
     saveState();
     updateLobbyEmptyCardStates();
+    showSlotInlineError(event.target, "Esta persona esta en otro puesto.");
+    return;
+  }
+
+  if (isRepeatedEmbarqueSelection(sections, changedSectionId, selectedPersonId)) {
+    event.target.value = "";
+    const correctedSections = collectAssignmentFromForm();
+    setCurrentAssignment(date, correctedSections, meta);
+    saveState();
     showSlotInlineError(event.target, "Esta persona esta en otro puesto.");
     return;
   }
@@ -612,6 +629,19 @@ function isRepeatedLobbyBaseSelection(sections, sectionId, roleId, personId) {
   let occurrences = 0;
   LOBBY_BASE_ROLE_IDS.forEach((lobbyRoleId) => {
     (sections.principales?.[lobbyRoleId] || []).forEach((assignedId) => {
+      if (assignedId === personId) occurrences += 1;
+    });
+  });
+
+  return occurrences > 1;
+}
+
+function isRepeatedEmbarqueSelection(sections, sectionId, personId) {
+  if (!personId || sectionId !== "embarque") return false;
+
+  let occurrences = 0;
+  getSection("embarque").roles.forEach((role) => {
+    (sections.embarque?.[role.id] || []).forEach((assignedId) => {
       if (assignedId === personId) occurrences += 1;
     });
   });
@@ -1910,11 +1940,19 @@ function setCurrentAssignment(date, sections, meta = {}) {
 function collectAssignmentFromForm() {
   const sections = createEmptyFullAssignment();
   const selects = elements.assignmentBoard.querySelectorAll("select[data-section-id]");
+  const manualInputs = elements.assignmentBoard.querySelectorAll("input[data-manual-person]");
 
   selects.forEach((select) => {
     const sectionId = select.dataset.sectionId;
     const roleId = select.dataset.roleId;
     if (select.value) sections[sectionId][roleId].push(select.value);
+  });
+
+  manualInputs.forEach((input) => {
+    const sectionId = input.dataset.sectionId;
+    const roleId = input.dataset.roleId;
+    const name = input.value.trim();
+    if (name) sections[sectionId][roleId].push(createManualPersonId(name));
   });
 
   return sections;
@@ -2191,8 +2229,15 @@ function createRoleCard(section, role, displaySectionId) {
 
   const assignedIds =
     state.currentAssignment.sections?.[section.id]?.[role.id] || [];
-  const slotCount = getRoleCardSlotCount(section, role, displaySectionId, assignedIds);
-  applyLobbyEmptyCardState(roleCard, section, role, assignedIds, slotCount);
+  const manualMesaRole = isManualMesaRole(section, role, displaySectionId);
+  const selectableAssignedIds = manualMesaRole
+    ? assignedIds.filter((personId) => !isManualPersonId(personId))
+    : assignedIds;
+  const manualAssignedIds = manualMesaRole
+    ? assignedIds.filter((personId) => isManualPersonId(personId))
+    : [];
+  const slotCount = getRoleCardSlotCount(section, role, displaySectionId, selectableAssignedIds);
+  applyLobbyEmptyCardState(roleCard, section, role, selectableAssignedIds, slotCount);
   const requirements = getSlotRequirements(role);
 
   if (!slotCount) {
@@ -2204,8 +2249,14 @@ function createRoleCard(section, role, displaySectionId) {
 
   for (let index = 0; index < slotCount; index += 1) {
     slotGrid.appendChild(
-      createSlotSelect(section, role, index, assignedIds[index] || "", requirements[index], displaySectionId),
+      createSlotSelect(section, role, index, selectableAssignedIds[index] || "", requirements[index], displaySectionId),
     );
+  }
+
+  if (manualMesaRole) {
+    for (let index = 0; index < MESA_MANUAL_EXTRA_SLOTS; index += 1) {
+      slotGrid.appendChild(createManualPersonInput(section, role, index, manualAssignedIds[index] || ""));
+    }
   }
 
   roleCard.append(title, slotGrid);
@@ -2219,6 +2270,10 @@ function getRoleCardSlotCount(section, role, displaySectionId, assignedIds) {
   }
 
   return role.fillRest ? assignedIds.length : role.slots;
+}
+
+function isManualMesaRole(section, role, displaySectionId) {
+  return displaySectionId === "embarque_block" && section.id === "embarque" && role.id === "mesa";
 }
 
 function getDisplaySectionFixedSlotCount(displaySectionId) {
@@ -2332,9 +2387,39 @@ function createSlotSelect(section, role, index, selectedId, requirement = {}, di
   return row;
 }
 
+function createManualPersonInput(section, role, index, selectedId) {
+  const row = document.createElement("label");
+  row.className = "slot-row";
+
+  const input = document.createElement("input");
+  input.type = "text";
+  input.dataset.sectionId = section.id;
+  input.dataset.roleId = role.id;
+  input.dataset.slotIndex = index;
+  input.dataset.manualPerson = "true";
+  input.value = getManualPersonName(selectedId);
+  input.placeholder = "Nombre externo";
+  input.setAttribute("aria-label", `${role.label} externo ${index + 1}`);
+
+  row.appendChild(input);
+  return row;
+}
+
 function formatManualPersonOption(person) {
   if (!person) return "";
   return canUseRole(person, "embarque.etd") ? `${person.name} (etd)` : person.name;
+}
+
+function createManualPersonId(name) {
+  return `${MANUAL_PERSON_PREFIX}${name.trim()}`;
+}
+
+function isManualPersonId(personId) {
+  return typeof personId === "string" && personId.startsWith(MANUAL_PERSON_PREFIX);
+}
+
+function getManualPersonName(personId) {
+  return isManualPersonId(personId) ? personId.slice(MANUAL_PERSON_PREFIX.length).trim() : "";
 }
 
 function getPeopleForManualSelect(date, displaySectionId = "") {
@@ -2920,7 +3005,7 @@ function getPersonForDate(personId, date) {
 
 function getPersonName(personId, entry = null) {
   const person = getPerson(personId);
-  return person?.name || entry?.personSnapshot?.[personId] || "Persona eliminada";
+  return person?.name || entry?.personSnapshot?.[personId] || getManualPersonName(personId) || "Persona eliminada";
 }
 
 function getPersonGender(personId) {
