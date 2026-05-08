@@ -1134,7 +1134,30 @@ select:focus {
 
 .slot-row {
   display: grid;
+  gap: 6px;
   margin: 0;
+}
+
+.slot-row select.has-inline-error {
+  border-color: rgba(200, 30, 43, 0.72);
+  background: linear-gradient(135deg, rgba(254, 226, 226, 0.95), #ffffff);
+  box-shadow: 0 0 0 3px rgba(200, 30, 43, 0.12);
+}
+
+.slot-inline-error {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  max-width: 100%;
+  padding: 6px 9px;
+  border: 1px solid rgba(200, 30, 43, 0.18);
+  border-radius: 10px;
+  background: var(--danger-soft);
+  color: var(--danger);
+  font-size: 0.76rem;
+  font-weight: 800;
+  line-height: 1.2;
+  animation: noticeIn 0.2s ease both;
 }
 
 .role-time-field {

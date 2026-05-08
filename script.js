@@ -577,6 +577,7 @@ function handleManualAssignmentChange(event) {
   const selectedPersonId = event.target.value;
   const changedRoleId = event.target.dataset.roleId;
   const changedSectionId = event.target.dataset.sectionId;
+  clearSlotInlineError(event.target);
 
   if (isRepeatedLobbyBaseSelection(sections, changedSectionId, changedRoleId, selectedPersonId)) {
     event.target.value = "";
@@ -584,7 +585,7 @@ function handleManualAssignmentChange(event) {
     setCurrentAssignment(date, correctedSections, meta);
     saveState();
     updateLobbyEmptyCardStates();
-    showNotice("Esta persona esta en otro puesto.", "error");
+    showSlotInlineError(event.target, "Esta persona esta en otro puesto.");
     return;
   }
 
@@ -611,6 +612,27 @@ function isRepeatedLobbyBaseSelection(sections, sectionId, roleId, personId) {
   });
 
   return occurrences > 1;
+}
+
+function showSlotInlineError(select, message) {
+  const row = select.closest(".slot-row");
+  if (!row) return;
+
+  clearSlotInlineError(select);
+  select.classList.add("has-inline-error");
+
+  const messageElement = document.createElement("span");
+  messageElement.className = "slot-inline-error";
+  messageElement.textContent = message;
+  row.appendChild(messageElement);
+}
+
+function clearSlotInlineError(select) {
+  const row = select.closest(".slot-row");
+  if (!row) return;
+
+  select.classList.remove("has-inline-error");
+  row.querySelector(".slot-inline-error")?.remove();
 }
 
 function handleResetGuard() {
