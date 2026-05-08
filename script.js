@@ -2297,14 +2297,14 @@ function createSlotSelect(section, role, index, selectedId, requirement = {}, di
   peopleOptions.forEach((person) => {
     const option = document.createElement("option");
     option.value = person.id;
-    option.textContent = person.name;
+    option.textContent = `${person.name} (${role.label})`;
     select.appendChild(option);
   });
 
   if (selectedId && !peopleOptions.some((person) => person.id === selectedId)) {
     const missingOption = document.createElement("option");
     missingOption.value = selectedId;
-    missingOption.textContent = getPersonName(selectedId);
+    missingOption.textContent = `${getPersonName(selectedId)} (${role.label})`;
     select.appendChild(missingOption);
   }
 
