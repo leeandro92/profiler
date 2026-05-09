@@ -22,21 +22,92 @@ service cloud.firestore {
       return signedIn() && request.auth.uid == userId;
     }
 
+    function validRequiredText(field, maxSize) {
+      return field in request.resource.data
+        && request.resource.data[field] is string
+        && request.resource.data[field].size() > 0
+        && request.resource.data[field].size() <= maxSize;
+    }
+
+    function validOptionalText(field, maxSize) {
+      return !(field in request.resource.data)
+        || (
+          request.resource.data[field] is string
+          && request.resource.data[field].size() <= maxSize
+        );
+    }
+
+    function validOptionalBool(field) {
+      return !(field in request.resource.data)
+        || request.resource.data[field] is bool;
+    }
+
+    function validOptionalTimestamp(field) {
+      return !(field in request.resource.data)
+        || request.resource.data[field] is timestamp;
+    }
+
+    function validUserProfile(userId) {
+      return request.resource.data.keys().hasOnly([
+          "uid",
+          "email",
+          "emailKey",
+          "emailVerified",
+          "provider",
+          "firstName",
+          "lastName",
+          "fullName",
+          "gender",
+          "createdAt",
+          "updatedAt",
+          "lastLoginAt"
+        ])
+        && request.resource.data.keys().hasAll([
+          "uid",
+          "email",
+          "emailKey",
+          "provider"
+        ])
+        && request.resource.data.uid == userId
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.emailKey == request.resource.data.email
+        && request.resource.data.provider == "firebase-auth-email"
+        && validRequiredText("email", 180)
+        && validRequiredText("emailKey", 180)
+        && validOptionalBool("emailVerified")
+        && validOptionalText("firstName", 80)
+        && validOptionalText("lastName", 80)
+        && validOptionalText("fullName", 180)
+        && (
+          !("gender" in request.resource.data)
+          || request.resource.data.gender in ["hombre", "mujer", "otro"]
+        )
+        && validOptionalTimestamp("createdAt")
+        && validOptionalTimestamp("updatedAt")
+        && validOptionalTimestamp("lastLoginAt");
+    }
+
     function ownProfileWrite(userId) {
-      return self(userId);
+      return self(userId) && validUserProfile(userId);
     }
 
     function limitedPublicUserLookup() {
       return request.query.limit != null && request.query.limit <= 26;
     }
 
+    function validDocumentId(documentId) {
+      return documentId is string && documentId.size() > 0 && documentId.size() <= 180;
+    }
+
     match /profilers_history/{entryId} {
-      allow read, create, update, delete: if owner();
+      allow read: if owner();
+      allow create, update, delete: if owner() && validDocumentId(entryId);
     }
 
     match /profilers_vacations/{entryId} {
       allow read: if verified();
-      allow create, update, delete: if owner();
+      allow create, update, delete: if owner() && validDocumentId(entryId);
     }
 
     match /profilers_auth_users/{userId} {
