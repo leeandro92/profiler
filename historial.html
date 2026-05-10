@@ -12,6 +12,8 @@
     />
     <link rel="stylesheet" href="styles.css?v=20260510-1" />
     <link rel="stylesheet" href="profile-menu.css?v=20260510-1" />
+    <link rel="stylesheet" href="theme.css?v=20260510-1" />
+    <script src="theme-toggle.js?v=20260510-1" defer></script>
   </head>
   <body class="owner-auth-locked">
     <main id="top" class="app-shell history-page" data-owner-shell hidden>
@@ -32,6 +34,10 @@
           <a class="nav-link" href="vacaciones.html" data-vacations-link hidden>Vacaciones</a>
           <a class="nav-link" href="grilla.html" data-grilla-link hidden>Calendario</a>
           <a class="nav-link" href="administrador.html" data-admin-link hidden>Vacaciones</a>
+          <button class="nav-link theme-toggle-button" type="button" data-theme-toggle aria-label="Cambiar modo claro u oscuro" aria-pressed="false">
+            <span class="theme-toggle-icon" aria-hidden="true">☾</span>
+            <span class="theme-toggle-text">Oscuro</span>
+          </button>
           <button class="nav-link auth-logout-button" type="button" data-auth-logout hidden>Cerrar sesion</button>
         </nav>
       </header>
