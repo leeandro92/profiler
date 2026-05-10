@@ -19,6 +19,8 @@ const ownerPageLinks = [...document.querySelectorAll("[data-owner-link]")];
 const brandLinks = [...document.querySelectorAll(".brand")];
 const ownerShell = document.querySelector("[data-owner-shell]");
 const isOwnerProtectedPage = Boolean(ownerShell);
+const currentPageName = getCurrentPageName();
+const currentAccessRule = getCurrentAccessRule(currentPageName);
 
 document.addEventListener(AUTH_NAV_OWNER_READY_EVENT, (event) => {
   const email = normalizeAuthEmail(event.detail?.email);
@@ -46,14 +48,21 @@ async function initAuthNavigation() {
     authTools.onAuthStateChanged(auth, async (user) => {
       setAuthNavigationState(user);
 
+      if (!canAccessCurrentPage(user)) {
+        lockProtectedShells();
+        updateAuthProfileMenus(null);
+        redirectToAllowedPage(user);
+        return;
+      }
+
       if (isOwnerProtectedPage && !isAllowedVacationsUser(user)) {
         lockOwnerProtectedShell();
-        window.location.href = user?.emailVerified ? "administrador.html" : "index.html";
+        window.location.replace(user?.emailVerified ? "administrador.html" : "index.html");
         return;
       }
 
       if (!user?.emailVerified) {
-        lockOwnerProtectedShell();
+        lockProtectedShells();
         updateAuthProfileMenus(null);
         return;
       }
@@ -69,8 +78,8 @@ async function initAuthNavigation() {
     console.warn("No se pudo validar la sesion para mostrar enlaces protegidos.", error);
     setAuthNavigationState(null);
     updateAuthProfileMenus(null);
-    lockOwnerProtectedShell();
-    if (isOwnerProtectedPage) window.location.href = "index.html";
+    lockProtectedShells();
+    if (currentAccessRule !== "public") window.location.replace("index.html");
   }
 }
 
@@ -185,6 +194,13 @@ function unlockOwnerProtectedShell(user) {
   document.body.classList.add("owner-auth-ready");
   document.body.dataset.ownerAuthEmail = normalizeAuthEmail(user?.email);
   ownerShell?.removeAttribute("hidden");
+}
+
+function lockProtectedShells() {
+  lockOwnerProtectedShell();
+  document.querySelector("[data-vacations-shell]")?.setAttribute("hidden", "");
+  document.querySelector("[data-admin-shell]")?.setAttribute("hidden", "");
+  document.querySelector("[data-grilla-shell]")?.setAttribute("hidden", "");
 }
 
 function setupAuthProfileMenus() {
@@ -349,6 +365,38 @@ function getProfileGender(user, profile = {}) {
 
 function isAllowedVacationsUser(user) {
   return Boolean(user?.emailVerified) && OWNER_ALLOWED_EMAILS.has(normalizeAuthEmail(user?.email));
+}
+
+function getCurrentPageName() {
+  const pageName = window.location.pathname.split("/").pop();
+  return pageName || "index.html";
+}
+
+function getCurrentAccessRule(pageName) {
+  const accessRules = {
+    "login.html": "owner",
+    "historial.html": "owner",
+    "vacaciones.html": "owner",
+    "administrador.html": "verified",
+    "grilla.html": "verified",
+  };
+
+  return accessRules[pageName] || "public";
+}
+
+function canAccessCurrentPage(user) {
+  if (currentAccessRule === "public") return true;
+  if (!user?.emailVerified) return false;
+  if (currentAccessRule === "owner") return isAllowedVacationsUser(user);
+  if (currentAccessRule === "verified") return true;
+  return false;
+}
+
+function redirectToAllowedPage(user) {
+  const redirectTarget = user?.emailVerified ? "administrador.html" : "index.html";
+  if (currentPageName !== redirectTarget) {
+    window.location.replace(redirectTarget);
+  }
 }
 
 function toggleHidden(element, hidden) {
