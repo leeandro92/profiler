@@ -5,77 +5,6 @@
   --enhance-muted: #64748b;
 }
 
-body::after {
-  position: fixed;
-  inset: auto 18px 18px auto;
-  z-index: -1;
-  width: min(340px, 48vw);
-  height: min(340px, 48vw);
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(225, 38, 47, 0.16), transparent 68%);
-  content: "";
-  pointer-events: none;
-}
-
-.app-loading-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 4000;
-  display: grid;
-  place-items: center;
-  padding: 24px;
-  background:
-    radial-gradient(circle at top left, rgba(225, 38, 47, 0.2), transparent 34%),
-    linear-gradient(135deg, rgba(248, 250, 252, 0.96), rgba(255, 255, 255, 0.9));
-  backdrop-filter: blur(14px);
-  opacity: 1;
-  transition:
-    opacity 0.28s ease,
-    visibility 0.28s ease;
-}
-
-.app-loading-overlay.is-hidden {
-  visibility: hidden;
-  opacity: 0;
-  pointer-events: none;
-}
-
-.app-loading-card {
-  display: grid;
-  gap: 14px;
-  justify-items: center;
-  width: min(320px, 100%);
-  padding: 28px;
-  border: 1px solid rgba(225, 38, 47, 0.14);
-  border-radius: 22px;
-  background: var(--enhance-glass-strong);
-  color: var(--enhance-ink);
-  text-align: center;
-  box-shadow: 0 28px 80px rgba(15, 23, 42, 0.2);
-}
-
-.app-loading-mark {
-  width: 46px;
-  height: 46px;
-  border: 4px solid rgba(225, 38, 47, 0.14);
-  border-top-color: var(--primary, #e1262f);
-  border-radius: 50%;
-  animation: appSpin 0.9s linear infinite;
-}
-
-.app-loading-title {
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 900;
-}
-
-.app-loading-text {
-  margin: 0;
-  color: var(--enhance-muted);
-  font-size: 0.9rem;
-  font-weight: 700;
-}
-
 .app-toast-region {
   position: fixed;
   right: 18px;
@@ -203,12 +132,6 @@ body::after {
     radial-gradient(circle at 62% 62%, rgba(24, 24, 27, 0.1), transparent 58%);
   content: "";
   filter: blur(2px);
-}
-
-@keyframes appSpin {
-  to {
-    transform: rotate(360deg);
-  }
 }
 
 @keyframes softRise {

@@ -9,39 +9,11 @@
   ];
 
   document.addEventListener("DOMContentLoaded", () => {
-    const overlay = createLoadingOverlay();
     const toastRegion = createToastRegion();
 
     observeStatusMessages(toastRegion);
-    hideLoaderWhenReady(overlay);
+    document.documentElement.classList.add("enhancements-ready");
   });
-
-  function createLoadingOverlay() {
-    const overlay = document.createElement("div");
-    overlay.className = "app-loading-overlay";
-    overlay.setAttribute("aria-live", "polite");
-    overlay.innerHTML = `
-      <div class="app-loading-card">
-        <span class="app-loading-mark" aria-hidden="true"></span>
-        <p class="app-loading-title">Preparando Profiler</p>
-        <p class="app-loading-text">Validando datos y acceso...</p>
-      </div>
-    `;
-    document.body.appendChild(overlay);
-    return overlay;
-  }
-
-  function hideLoaderWhenReady(overlay) {
-    const hide = () => {
-      overlay.classList.add("is-hidden");
-      window.setTimeout(() => overlay.remove(), 380);
-    };
-
-    window.addEventListener("load", () => window.setTimeout(hide, 280), { once: true });
-    document.addEventListener("profiler-owner-nav-ready", hide, { once: true });
-    document.addEventListener("administrator-auth-ready", hide, { once: true });
-    window.setTimeout(hide, 2200);
-  }
 
   function createToastRegion() {
     const region = document.createElement("div");
