@@ -1690,13 +1690,16 @@ label {
   }
 
   .calendar-grid {
-    gap: 5px;
-    padding: 7px;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 4px;
+    padding: 6px;
   }
 
   .day-cell {
+    min-width: 0;
     min-height: 92px;
-    padding: 6px;
+    overflow: hidden;
+    padding: 6px 4px;
   }
 
   .day-number {
@@ -1706,9 +1709,16 @@ label {
   }
 
   .assignment-pill {
-    overflow: visible;
-    padding: 4px 5px;
-    font-size: clamp(0.5rem, 1.75vw, 0.62rem);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+    padding: 4px 2px;
+    font-size: 0.52rem;
+    letter-spacing: 0;
     text-align: center;
     text-overflow: clip;
     white-space: nowrap;
@@ -1720,6 +1730,9 @@ label {
 
   .assignment-name-last {
     display: block;
+    max-width: 100%;
+    overflow: visible;
+    white-space: nowrap;
   }
 }
 
@@ -1729,12 +1742,14 @@ label {
   }
 
   .calendar-grid {
-    gap: 3px;
+    gap: 2px;
+    padding: 5px 3px;
   }
 
   .day-cell {
-    min-height: 78px;
+    min-height: 82px;
     border-radius: 6px;
+    padding: 5px 2px;
   }
 
   .assignment-stack {
@@ -1743,9 +1758,9 @@ label {
   }
 
   .assignment-pill {
-    overflow: visible;
-    padding: 3px 2px;
-    font-size: clamp(0.46rem, 2.15vw, 0.56rem);
+    overflow: hidden;
+    padding: 3px 1px;
+    font-size: 0.46rem;
     line-height: 1.05;
     text-align: center;
     text-overflow: clip;
