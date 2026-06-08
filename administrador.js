@@ -3,7 +3,7 @@ const adminPeople = [
   { name: "Ailin Andres", color: "#db2777" },
   { name: "Vanesa Scalora", color: "#059669" },
   { name: "Elena Rubilar", color: "#7c3aed" },
-  { name: "Paulina Murua", color: "#ea580c" },
+  { name: "Sofia Ibarra", color: "#ea580c" },
   { name: "Axel Aros", color: "#0891b2" },
   { name: "Juan Aloe", color: "#ca8a04" },
   { name: "Carlos Castillo", color: "#4f46e5" },
