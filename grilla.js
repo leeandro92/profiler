@@ -33,6 +33,8 @@ const PERSON_GENDERS = {
   "marine rosini": "mujer",
   "micaela alvarez": "mujer",
   "milagros rolon": "mujer",
+  "morena berns": "mujer",
+  "morena bernz": "mujer",
   "nieto leandro": "hombre",
   "sofia ibarra": "mujer",
   "rubilar helena": "mujer",
@@ -78,6 +80,7 @@ const PERSON_COLORS = {
   "leonardo feldman": "#1d4ed8",
   "leonardo felman": "#1d4ed8",
   "morena berns": "#3cd81d",
+  "morena bernz": "#3cd81d",
 };
 
 let grillaData = {};

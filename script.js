@@ -41,7 +41,7 @@ const GROUPS = [
       { id: "g1-andres", name: "Andres", gender: "mujer", blockedRoles: ["embarque.etd"] },
       {
         id: "g1-morena-berns",
-        name: "Berns",
+        name: "Bernz",
         gender: "mujer",
         blockedRoles: ["embarque.etd", "principales.catering"],
       },
