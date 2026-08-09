@@ -1802,7 +1802,7 @@ label {
 
   .day-cell {
     min-width: 0;
-    min-height: 92px;
+    min-height: 102px;
     overflow: hidden;
     padding: 6px 4px;
   }
@@ -1821,12 +1821,20 @@ label {
     max-width: 100%;
     box-sizing: border-box;
     overflow: hidden;
-    padding: 4px 2px;
-    font-size: var(--assignment-font-size, 0.52rem);
+    min-height: 22px;
+    padding: 4px 3px;
+    font-size: clamp(0.5rem, 1.9vw, 0.58rem);
     letter-spacing: 0;
     text-align: center;
     text-overflow: clip;
-    white-space: nowrap;
+    white-space: normal;
+  }
+
+  .assignment-name-last {
+    overflow-wrap: anywhere;
+    transform: none;
+    white-space: normal;
+    word-break: normal;
   }
 }
 
@@ -1841,7 +1849,7 @@ label {
   }
 
   .day-cell {
-    min-height: 82px;
+    min-height: 96px;
     border-radius: 6px;
     padding: 5px 2px;
   }
@@ -1853,12 +1861,20 @@ label {
 
   .assignment-pill {
     overflow: hidden;
-    padding: 3px 1px;
-    font-size: var(--assignment-font-size, 0.46rem);
-    line-height: 1.05;
+    min-height: 22px;
+    padding: 3px 2px;
+    font-size: clamp(0.48rem, 2.3vw, 0.54rem);
+    line-height: 1.08;
     text-align: center;
     text-overflow: clip;
-    white-space: nowrap;
+    white-space: normal;
+  }
+
+  .assignment-name-last {
+    overflow-wrap: anywhere;
+    transform: none;
+    white-space: normal;
+    word-break: normal;
   }
 
   .site-footer,
