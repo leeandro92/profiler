@@ -168,27 +168,16 @@ function renderAdministratorAssignmentPill(name) {
   const color = person ? person.color : "#64748b";
   const lastName = getAdministratorLastName(person?.name || name);
   const fitStyle = getAdministratorAssignmentNameFitStyle(lastName);
-  return `<span class="assignment-pill" style="background:${color}; ${fitStyle}" title="${escapeHtmlAdmin(person?.name || name)}"><span class="assignment-name-last">${renderAdministratorAssignmentLastName(lastName)}</span></span>`;
-}
-
-function renderAdministratorAssignmentLastName(lastName) {
-  const text = String(lastName || "").trim();
-  if (text.length <= 6) return `<span class="assignment-name-line">${escapeHtmlAdmin(text)}</span>`;
-
-  const splitIndex = Math.ceil(text.length / 2);
-  return `
-    <span class="assignment-name-line">${escapeHtmlAdmin(text.slice(0, splitIndex))}</span>
-    <span class="assignment-name-line">${escapeHtmlAdmin(text.slice(splitIndex))}</span>
-  `;
+  return `<span class="assignment-pill" style="background:${color}; ${fitStyle}" title="${escapeHtmlAdmin(person?.name || name)}"><span class="assignment-surname">${escapeHtmlAdmin(lastName)}</span></span>`;
 }
 
 function getAdministratorAssignmentNameFitStyle(lastName) {
   const length = String(lastName || "").length;
   if (length <= 6) return "--assignment-font-size:0.72rem; --assignment-x-scale:1;";
-  if (length <= 8) return "--assignment-font-size:0.66rem; --assignment-x-scale:0.96;";
-  if (length <= 10) return "--assignment-font-size:0.58rem; --assignment-x-scale:0.9;";
-  if (length <= 12) return "--assignment-font-size:0.52rem; --assignment-x-scale:0.84;";
-  return "--assignment-font-size:0.48rem; --assignment-x-scale:0.78;";
+  if (length <= 8) return "--assignment-font-size:0.6rem; --assignment-x-scale:0.9;";
+  if (length <= 10) return "--assignment-font-size:0.52rem; --assignment-x-scale:0.8;";
+  if (length <= 12) return "--assignment-font-size:0.47rem; --assignment-x-scale:0.72;";
+  return "--assignment-font-size:0.43rem; --assignment-x-scale:0.66;";
 }
 
 async function hydrateAdministratorCalendarFromFirestore() {

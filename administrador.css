@@ -985,7 +985,7 @@ input:focus {
   box-shadow: inset 0 -20px 35px rgba(0, 0, 0, 0.08);
 }
 
-.assignment-name-last {
+.assignment-surname {
   display: grid;
   gap: 0;
   max-width: 100%;
@@ -993,11 +993,6 @@ input:focus {
   transform: scaleX(var(--assignment-x-scale, 1));
   transform-origin: center;
   white-space: nowrap;
-}
-
-.assignment-name-line {
-  display: block;
-  min-width: 0;
 }
 
 .more-pill {
@@ -1828,43 +1823,41 @@ label {
     max-width: 100%;
     box-sizing: border-box;
     overflow: hidden;
-    min-height: 22px;
-    padding: 4px 3px;
-    font-size: clamp(0.5rem, 1.9vw, 0.58rem);
+    min-height: 20px;
+    padding: 4px 2px;
+    font-size: var(--assignment-font-size, 0.55rem);
     letter-spacing: 0;
     text-align: center;
     text-overflow: clip;
-    white-space: normal;
+    white-space: nowrap;
   }
 
   .admin-readonly-day .assignment-pill {
     height: auto !important;
-    min-height: 24px;
+    min-height: 20px;
     overflow: hidden !important;
     text-overflow: clip !important;
-    white-space: normal !important;
+    white-space: nowrap !important;
   }
 
-  .assignment-name-last {
-    overflow-wrap: anywhere;
-    transform: none;
-    white-space: normal;
-    word-break: normal;
+  .assignment-surname {
+    display: block;
+    max-width: 100%;
+    overflow: visible;
+    line-height: 1.05;
+    overflow-wrap: normal;
+    transform: scaleX(var(--assignment-x-scale, 1));
+    transform-origin: center;
+    white-space: nowrap;
+    word-break: keep-all;
   }
 
-  .admin-readonly-day .assignment-name-last {
-    display: grid !important;
+  .admin-readonly-day .assignment-surname {
+    display: block !important;
     max-width: 100%;
     overflow: visible !important;
     text-overflow: clip !important;
-    white-space: normal !important;
-  }
-
-  .admin-readonly-day .assignment-name-line {
-    display: block;
-    overflow: visible;
-    text-overflow: clip;
-    white-space: normal;
+    white-space: nowrap !important;
   }
 }
 
@@ -1891,25 +1884,25 @@ label {
 
   .assignment-pill {
     overflow: hidden;
-    min-height: 22px;
-    padding: 3px 2px;
-    font-size: clamp(0.48rem, 2.3vw, 0.54rem);
-    line-height: 1.08;
+    min-height: 20px;
+    padding: 3px 1px;
+    font-size: var(--assignment-font-size, 0.5rem);
+    line-height: 1;
     text-align: center;
     text-overflow: clip;
-    white-space: normal;
+    white-space: nowrap;
   }
 
   .admin-readonly-day .assignment-pill {
-    min-height: 25px;
+    min-height: 20px;
     padding: 3px 1px;
   }
 
-  .assignment-name-last {
-    overflow-wrap: anywhere;
-    transform: none;
-    white-space: normal;
-    word-break: normal;
+  .assignment-surname {
+    overflow-wrap: normal;
+    transform: scaleX(var(--assignment-x-scale, 1));
+    white-space: nowrap;
+    word-break: keep-all;
   }
 
   .site-footer,
