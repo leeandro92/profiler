@@ -413,7 +413,7 @@ function renderAssignmentPill(name) {
   const lastName = getLastName(person?.name || name);
   const fitStyle = getAssignmentNameFitStyle(lastName);
   return `
-    <span class="assignment-pill" style="background:${color}; ${fitStyle}" title="${escapeHtml(person?.name || name)}">
+    <span class="assignment-pill calendar-surname-pill" data-surname="${escapeHtml(lastName)}" style="background:${color}; ${fitStyle}; overflow:hidden; text-overflow:clip; white-space:nowrap;" title="${escapeHtml(person?.name || name)}">
       <span class="assignment-surname">${escapeHtml(lastName)}</span>
     </span>
   `;
@@ -1356,6 +1356,7 @@ function findPerson(name) {
   const singlePartMatches = singlePart
     ? people.filter((person) => normalizeSearchText(person.name).split(" ").includes(singlePart))
     : [];
+  const prefixMatch = findPersonByPrefix(singlePart);
 
   return (
     people.find((person) => normalizeSearchText(person.name) === normalizedName) ||
@@ -1369,7 +1370,21 @@ function findPerson(name) {
       return lastName && normalizedParts.has(lastName);
     }) ||
     (singlePartMatches.length === 1 ? singlePartMatches[0] : null)
+    || prefixMatch
   );
+}
+
+function findPersonByPrefix(value) {
+  const prefix = normalizeSearchText(value).replace(/[.…]+$/g, "");
+  if (prefix.length < 2) return null;
+
+  const matches = people.filter((person) =>
+    normalizeSearchText(person.name)
+      .split(" ")
+      .some((part) => part.startsWith(prefix))
+  );
+
+  return matches.length === 1 ? matches[0] : null;
 }
 
 function toISODate(date) {

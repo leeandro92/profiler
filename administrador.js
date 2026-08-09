@@ -168,7 +168,7 @@ function renderAdministratorAssignmentPill(name) {
   const color = person ? person.color : "#64748b";
   const lastName = getAdministratorLastName(person?.name || name);
   const fitStyle = getAdministratorAssignmentNameFitStyle(lastName);
-  return `<span class="assignment-pill" style="background:${color}; ${fitStyle}" title="${escapeHtmlAdmin(person?.name || name)}"><span class="assignment-surname">${escapeHtmlAdmin(lastName)}</span></span>`;
+  return `<span class="assignment-pill calendar-surname-pill" data-surname="${escapeHtmlAdmin(lastName)}" style="background:${color}; ${fitStyle}; overflow:hidden; text-overflow:clip; white-space:nowrap;" title="${escapeHtmlAdmin(person?.name || name)}"><span class="assignment-surname">${escapeHtmlAdmin(lastName)}</span></span>`;
 }
 
 function getAdministratorAssignmentNameFitStyle(lastName) {
@@ -310,6 +310,7 @@ function findAdministratorPerson(name) {
   const singlePartMatches = singlePart
     ? adminPeople.filter((person) => normalizeAdminText(person.name).split(" ").includes(singlePart))
     : [];
+  const prefixMatch = findAdministratorPersonByPrefix(singlePart);
 
   return (
     adminPeople.find((person) => normalizeAdminText(person.name) === normalizedName) ||
@@ -323,7 +324,21 @@ function findAdministratorPerson(name) {
       return lastName && normalizedParts.has(lastName);
     }) ||
     (singlePartMatches.length === 1 ? singlePartMatches[0] : null)
+    || prefixMatch
   );
+}
+
+function findAdministratorPersonByPrefix(value) {
+  const prefix = normalizeAdminText(value).replace(/[.…]+$/g, "");
+  if (prefix.length < 2) return null;
+
+  const matches = adminPeople.filter((person) =>
+    normalizeAdminText(person.name)
+      .split(" ")
+      .some((part) => part.startsWith(prefix))
+  );
+
+  return matches.length === 1 ? matches[0] : null;
 }
 
 function showAdministratorStatus(message, type = "success") {

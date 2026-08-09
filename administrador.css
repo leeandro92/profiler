@@ -995,6 +995,19 @@ input:focus {
   white-space: nowrap;
 }
 
+.calendar-surname-pill {
+  overflow: hidden !important;
+  text-overflow: clip !important;
+  white-space: nowrap !important;
+}
+
+.calendar-surname-pill .assignment-surname {
+  display: block !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  white-space: nowrap !important;
+}
+
 .more-pill {
   color: var(--muted);
   font-size: 0.72rem;
@@ -1837,6 +1850,14 @@ label {
     min-height: 20px;
     overflow: hidden !important;
     text-overflow: clip !important;
+    white-space: nowrap !important;
+  }
+
+  .admin-readonly-day .calendar-surname-pill {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    overflow: hidden !important;
     white-space: nowrap !important;
   }
 
