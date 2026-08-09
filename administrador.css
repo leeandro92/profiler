@@ -1837,11 +1837,34 @@ label {
     white-space: normal;
   }
 
+  .admin-readonly-day .assignment-pill {
+    height: auto !important;
+    min-height: 24px;
+    overflow: hidden !important;
+    text-overflow: clip !important;
+    white-space: normal !important;
+  }
+
   .assignment-name-last {
     overflow-wrap: anywhere;
     transform: none;
     white-space: normal;
     word-break: normal;
+  }
+
+  .admin-readonly-day .assignment-name-last {
+    display: grid !important;
+    max-width: 100%;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    white-space: normal !important;
+  }
+
+  .admin-readonly-day .assignment-name-line {
+    display: block;
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
   }
 }
 
@@ -1875,6 +1898,11 @@ label {
     text-align: center;
     text-overflow: clip;
     white-space: normal;
+  }
+
+  .admin-readonly-day .assignment-pill {
+    min-height: 25px;
+    padding: 3px 1px;
   }
 
   .assignment-name-last {
