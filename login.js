@@ -2,7 +2,7 @@ const FIREBASE_AUTH_SDK_VERSION = "12.12.1";
 const AUTH_USERS_COLLECTION = "profilers_auth_users";
 const LOGIN_VACATIONS_ALLOWED_EMAIL = "lean-nieto.92@hotmail.com";
 const LOGIN_OWNER_EMAILS = new Set([LOGIN_VACATIONS_ALLOWED_EMAIL, "brestlauraceleste@gmail.com"]);
-const MAX_REGISTERED_USERS = 25;
+const MAX_REGISTERED_USERS = 30;
 const BLOCKED_REGISTER_EMAILS = new Set(["lauracelestebrest@hotmail.com"]);
 const AUTH_GENDER_OVERRIDES = new Map([["shaka0021@gmail.com", "mujer"]]);
 

@@ -93,7 +93,7 @@ service cloud.firestore {
     }
 
     function limitedPublicUserLookup() {
-      return request.query.limit != null && request.query.limit <= 26;
+      return request.query.limit != null && request.query.limit <= 31;
     }
 
     function validDocumentId(documentId) {
