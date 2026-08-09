@@ -166,9 +166,20 @@ function createAdministratorDayCell(date, isCurrentMonth) {
 function renderAdministratorAssignmentPill(name) {
   const person = findAdministratorPerson(name);
   const color = person ? person.color : "#64748b";
-  const lastName = getAdministratorLastName(name);
+  const lastName = getAdministratorLastName(person?.name || name);
   const fitStyle = getAdministratorAssignmentNameFitStyle(lastName);
-  return `<span class="assignment-pill" style="background:${color}; ${fitStyle}" title="${escapeHtmlAdmin(name)}"><span class="assignment-name-last">${escapeHtmlAdmin(lastName)}</span></span>`;
+  return `<span class="assignment-pill" style="background:${color}; ${fitStyle}" title="${escapeHtmlAdmin(person?.name || name)}"><span class="assignment-name-last">${renderAdministratorAssignmentLastName(lastName)}</span></span>`;
+}
+
+function renderAdministratorAssignmentLastName(lastName) {
+  const text = String(lastName || "").trim();
+  if (text.length <= 6) return `<span class="assignment-name-line">${escapeHtmlAdmin(text)}</span>`;
+
+  const splitIndex = Math.ceil(text.length / 2);
+  return `
+    <span class="assignment-name-line">${escapeHtmlAdmin(text.slice(0, splitIndex))}</span>
+    <span class="assignment-name-line">${escapeHtmlAdmin(text.slice(splitIndex))}</span>
+  `;
 }
 
 function getAdministratorAssignmentNameFitStyle(lastName) {
@@ -306,6 +317,10 @@ function buildAdministratorVacationsFromSummaries(summaries) {
 function findAdministratorPerson(name) {
   const normalizedName = normalizeAdminText(name);
   const normalizedParts = new Set(normalizedName.split(" ").filter(Boolean));
+  const singlePart = normalizedParts.size === 1 ? [...normalizedParts][0] : "";
+  const singlePartMatches = singlePart
+    ? adminPeople.filter((person) => normalizeAdminText(person.name).split(" ").includes(singlePart))
+    : [];
 
   return (
     adminPeople.find((person) => normalizeAdminText(person.name) === normalizedName) ||
@@ -313,7 +328,12 @@ function findAdministratorPerson(name) {
       const personParts = normalizeAdminText(person.name).split(" ").filter(Boolean);
       return personParts.length && personParts.every((part) => normalizedParts.has(part));
     }) ||
-    null
+    adminPeople.find((person) => {
+      const personParts = normalizeAdminText(person.name).split(" ").filter(Boolean);
+      const lastName = personParts[personParts.length - 1];
+      return lastName && normalizedParts.has(lastName);
+    }) ||
+    (singlePartMatches.length === 1 ? singlePartMatches[0] : null)
   );
 }
 

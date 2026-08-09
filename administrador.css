@@ -986,11 +986,18 @@ input:focus {
 }
 
 .assignment-name-last {
-  display: block;
+  display: grid;
+  gap: 0;
   max-width: 100%;
+  line-height: 1.02;
   transform: scaleX(var(--assignment-x-scale, 1));
   transform-origin: center;
   white-space: nowrap;
+}
+
+.assignment-name-line {
+  display: block;
+  min-width: 0;
 }
 
 .more-pill {

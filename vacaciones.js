@@ -410,12 +410,23 @@ function createDayCell(date) {
 function renderAssignmentPill(name) {
   const person = findPerson(name);
   const color = person ? person.color : "#64748b";
-  const lastName = getLastName(name);
+  const lastName = getLastName(person?.name || name);
   const fitStyle = getAssignmentNameFitStyle(lastName);
   return `
-    <span class="assignment-pill" style="background:${color}; ${fitStyle}" title="${escapeHtml(name)}">
-      <span class="assignment-name-last">${escapeHtml(lastName)}</span>
+    <span class="assignment-pill" style="background:${color}; ${fitStyle}" title="${escapeHtml(person?.name || name)}">
+      <span class="assignment-name-last">${renderAssignmentLastName(lastName)}</span>
     </span>
+  `;
+}
+
+function renderAssignmentLastName(lastName) {
+  const text = String(lastName || "").trim();
+  if (text.length <= 6) return `<span class="assignment-name-line">${escapeHtml(text)}</span>`;
+
+  const splitIndex = Math.ceil(text.length / 2);
+  return `
+    <span class="assignment-name-line">${escapeHtml(text.slice(0, splitIndex))}</span>
+    <span class="assignment-name-line">${escapeHtml(text.slice(splitIndex))}</span>
   `;
 }
 
@@ -1352,6 +1363,10 @@ function slugify(value) {
 function findPerson(name) {
   const normalizedName = normalizeSearchText(name);
   const normalizedParts = new Set(normalizedName.split(" ").filter(Boolean));
+  const singlePart = normalizedParts.size === 1 ? [...normalizedParts][0] : "";
+  const singlePartMatches = singlePart
+    ? people.filter((person) => normalizeSearchText(person.name).split(" ").includes(singlePart))
+    : [];
 
   return (
     people.find((person) => normalizeSearchText(person.name) === normalizedName) ||
@@ -1363,7 +1378,8 @@ function findPerson(name) {
       const personParts = normalizeSearchText(person.name).split(" ").filter(Boolean);
       const lastName = personParts[personParts.length - 1];
       return lastName && normalizedParts.has(lastName);
-    })
+    }) ||
+    (singlePartMatches.length === 1 ? singlePartMatches[0] : null)
   );
 }
 
