@@ -166,7 +166,18 @@ function createAdministratorDayCell(date, isCurrentMonth) {
 function renderAdministratorAssignmentPill(name) {
   const person = findAdministratorPerson(name);
   const color = person ? person.color : "#64748b";
-  return `<span class="assignment-pill" style="background:${color}" title="${escapeHtmlAdmin(name)}">${escapeHtmlAdmin(getAdministratorLastName(name))}</span>`;
+  const lastName = getAdministratorLastName(name);
+  const fitStyle = getAdministratorAssignmentNameFitStyle(lastName);
+  return `<span class="assignment-pill" style="background:${color}; ${fitStyle}" title="${escapeHtmlAdmin(name)}"><span class="assignment-name-last">${escapeHtmlAdmin(lastName)}</span></span>`;
+}
+
+function getAdministratorAssignmentNameFitStyle(lastName) {
+  const length = String(lastName || "").length;
+  if (length <= 6) return "--assignment-font-size:0.72rem; --assignment-x-scale:1;";
+  if (length <= 8) return "--assignment-font-size:0.66rem; --assignment-x-scale:0.96;";
+  if (length <= 10) return "--assignment-font-size:0.58rem; --assignment-x-scale:0.9;";
+  if (length <= 12) return "--assignment-font-size:0.52rem; --assignment-x-scale:0.84;";
+  return "--assignment-font-size:0.48rem; --assignment-x-scale:0.78;";
 }
 
 async function hydrateAdministratorCalendarFromFirestore() {
