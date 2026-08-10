@@ -21,7 +21,7 @@ const people = [
   { name: "Micaela Alvarez", color: "#475569" },
   { name: "Leonardo Feldman", color: "#1d4ed8" },
   { name: "Morena Bernz", color: "#3cd81d" },
-  { name: "Catarina Miloslavich", color: "#f97316" },
+  { name: "Katarina Miloslavich", color: "#f97316" },
   { name: "Juliana Lopez", color: "#8b5cf6" }
 ];
 

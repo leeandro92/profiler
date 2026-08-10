@@ -21,6 +21,7 @@ const PERSON_GENDERS = {
   "aros axel": "hombre",
   "castillo carlos": "hombre",
   "catarina miloslavich": "mujer",
+  "katarina miloslavich": "mujer",
   "hernan gonsalez": "hombre",
   "hernan gonzales": "hombre",
   "juliana lopez": "mujer",
@@ -58,6 +59,7 @@ const PERSON_COLORS = {
   "carlos castillo": "#4f46e5",
   "castillo carlos": "#4f46e5",
   "catarina miloslavich": "#f97316",
+  "katarina miloslavich": "#f97316",
   "laura brest": "#16a34a",
   "juliana lopez": "#8b5cf6",
   "milagros rolon": "#be123c",
@@ -106,7 +108,7 @@ const GRILLA_LEGEND_PEOPLE = [
   { name: "Micaela Alvarez", color: "#475569" },
   { name: "Leonardo Feldman", color: "#1d4ed8" },
   { name: "Morena Bernz", color: "#3cd81d" },
-  { name: "Catarina Miloslavich", color: "#f97316" },
+  { name: "Katarina Miloslavich", color: "#f97316" },
   { name: "Juliana Lopez", color: "#8b5cf6" },
 ];
 
