@@ -83,6 +83,33 @@ const PERSON_COLORS = {
   "morena bernz": "#3cd81d",
 };
 
+const GRILLA_LEGEND_PEOPLE = [
+  { name: "Leandro Nieto", color: "#2563eb" },
+  { name: "Ailin Andres", color: "#db2777" },
+  { name: "Vanesa Scalora", color: "#059669" },
+  { name: "Elena Rubilar", color: "#7c3aed" },
+  { name: "Sofia Ibarra", color: "#ea580c" },
+  { name: "Axel Aros", color: "#0891b2" },
+  { name: "Juan Aloe", color: "#ca8a04" },
+  { name: "Carlos Castillo", color: "#4f46e5" },
+  { name: "Laura Brest", color: "#16a34a" },
+  { name: "Milagros Rolon", color: "#be123c" },
+  { name: "Hernan Gonzales", color: "#0d9488" },
+  { name: "Marine Rosini", color: "#9333ea" },
+  { name: "Lucila Lopez", color: "#dc2626" },
+  { name: "Franco Acuna", color: "#0284c7" },
+  { name: "Laura Romero", color: "#65a30d" },
+  { name: "Tamara Garcia", color: "#c026d3" },
+  { name: "Macarena Gorosito", color: "#d97706" },
+  { name: "Lola Cordoba", color: "#0f766e" },
+  { name: "Kyara Rodriguez", color: "#e11d48" },
+  { name: "Micaela Alvarez", color: "#475569" },
+  { name: "Leonardo Feldman", color: "#1d4ed8" },
+  { name: "Morena Bernz", color: "#3cd81d" },
+  { name: "Catarina Miloslavich", color: "#f97316" },
+  { name: "Juliana Lopez", color: "#8b5cf6" },
+];
+
 let grillaData = {};
 let grillaSummaries = [];
 let hasCachedGrid = false;
@@ -96,6 +123,7 @@ const elements = {
   loadButton: document.querySelector("#loadGrillaData"),
   downloadButton: document.querySelector("#downloadGrillaImage"),
   status: document.querySelector("#grillaStatus"),
+  legend: document.querySelector("#grillaLegendList"),
 };
 
 init();
@@ -107,9 +135,23 @@ function init() {
   elements.year.addEventListener("change", handleYearChange);
   elements.loadButton.addEventListener("click", handleLoadDatabaseData);
   elements.downloadButton.addEventListener("click", handleDownloadImage);
+  renderGrillaLegend();
   loadCachedGridData();
   renderGrid(Number(elements.year.value));
   refreshGridDataFromDatabase({ automatic: true });
+}
+
+function renderGrillaLegend() {
+  if (!elements.legend) return;
+
+  elements.legend.innerHTML = GRILLA_LEGEND_PEOPLE
+    .map((person) => `
+      <div class="grilla-legend-item">
+        <span class="grilla-legend-dot" style="background:${person.color}"></span>
+        <span>${escapeHtml(person.name)}</span>
+      </div>
+    `)
+    .join("");
 }
 
 function handleYearChange() {

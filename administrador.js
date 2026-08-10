@@ -56,6 +56,7 @@ const adminStatus = document.querySelector("#adminCalendarStatus");
 const adminVacationSearchForm = document.querySelector("#adminVacationSearchForm");
 const adminVacationSearchInput = document.querySelector("#adminVacationSearchInput");
 const adminVacationSearchResults = document.querySelector("#adminVacationSearchResults");
+const adminLegendList = document.querySelector("#adminLegendList");
 
 if (document.body.classList.contains("admin-auth-ready")) {
   initAdministratorCalendar();
@@ -65,10 +66,24 @@ if (document.body.classList.contains("admin-auth-ready")) {
 
 async function initAdministratorCalendar() {
   populateAdminMonthSelect();
+  populateAdministratorLegend();
   bindAdministratorCalendarEvents();
   adminTodayChip.textContent = `Hoy: ${formatAdminDisplayDate(toAdminISODate(adminToday))}`;
   renderAdministratorCalendar();
   await hydrateAdministratorCalendarFromFirestore();
+}
+
+function populateAdministratorLegend() {
+  if (!adminLegendList) return;
+
+  adminLegendList.innerHTML = adminPeople
+    .map((person) => `
+      <div class="legend-item">
+        <span class="color-dot" style="background:${person.color}"></span>
+        <span>${escapeHtmlAdmin(person.name)}</span>
+      </div>
+    `)
+    .join("");
 }
 
 function populateAdminMonthSelect() {

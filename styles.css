@@ -1607,6 +1607,48 @@ select:focus {
   overflow: hidden;
 }
 
+.grilla-legend-panel {
+  margin-top: 20px;
+  padding: 20px;
+}
+
+.grilla-legend-header {
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.grilla-legend-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 10px;
+  max-height: 360px;
+  overflow: auto;
+  padding-right: 4px;
+}
+
+.grilla-legend-item {
+  display: grid;
+  grid-template-columns: 14px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid rgba(24, 24, 27, 0.08);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.82);
+  color: var(--ink);
+  font-size: 0.9rem;
+  font-weight: 850;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+}
+
+.grilla-legend-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.5);
+}
+
 .grilla-header {
   align-items: end;
 }
