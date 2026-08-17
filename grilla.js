@@ -14,6 +14,7 @@ const monthNames = [
 ];
 
 const PERSON_GENDERS = {
+  "abigail frank": "mujer",
   "acuña franco": "hombre",
   "acuna franco": "hombre",
   "ailin andres": "mujer",
@@ -45,6 +46,7 @@ const PERSON_GENDERS = {
 };
 
 const PERSON_COLORS = {
+  "abigail frank": "#f43f5e",
   "leandro nieto": "#2563eb",
   "nieto leandro": "#2563eb",
   "ailin andres": "#db2777",
@@ -110,6 +112,7 @@ const GRILLA_LEGEND_PEOPLE = [
   { name: "Morena Bernz", color: "#3cd81d" },
   { name: "Katarina Miloslavich", color: "#f97316" },
   { name: "Juliana Lopez", color: "#8b5cf6" },
+  { name: "Abigail Frank", color: "#f43f5e" },
 ];
 
 let grillaData = {};

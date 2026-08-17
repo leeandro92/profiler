@@ -22,7 +22,8 @@ const people = [
   { name: "Leonardo Feldman", color: "#1d4ed8" },
   { name: "Morena Bernz", color: "#3cd81d" },
   { name: "Katarina Miloslavich", color: "#f97316" },
-  { name: "Juliana Lopez", color: "#8b5cf6" }
+  { name: "Juliana Lopez", color: "#8b5cf6" },
+  { name: "Abigail Frank", color: "#f43f5e" }
 ];
 
 const monthNames = [
